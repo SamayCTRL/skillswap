@@ -1,0 +1,49 @@
+{
+  "name": "skill-swap",
+  "version": "1.0.0",
+  "description": "A comprehensive skill-sharing marketplace web application",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js",
+    "setup": "node setup.js",
+    "seed": "node server/utils/seedData.js",
+    "seed:clear": "node server/utils/seedData.js clear",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "skill-sharing",
+    "marketplace",
+    "nodejs",
+    "express",
+    "postgresql",
+    "socket.io",
+    "jwt"
+  ],
+  "author": "Skill Swap Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "pg": "^8.11.3",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "socket.io": "^4.7.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.0.0",
+    "express-rate-limit": "^6.10.0",
+    "express-validator": "^7.0.1",
+    "multer": "^1.4.5-lts.1",
+    "dotenv": "^16.3.1",
+    "body-parser": "^1.20.2",
+    "morgan": "^1.10.0",
+    "nodemailer": "^6.9.4",
+    "uuid": "^9.0.0",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Swap - Share Your Skills, Learn from Others</title>
+    <meta name="description" content="A marketplace for sharing skills and learning from experts. Connect, learn, and grow with Skill Swap.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js">
+    
+    <!-- Socket.io -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    
+    <!-- Jitsi Meet API -->
+    <script src="https://meet.jit.si/external_api.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading Skill Swap...</p>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Header -->
+    <header id="header" class="header">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <a href="/" class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="16" cy="16" r="16" fill="#3B82F6"/>
+                        <path d="M12 10h8v2h-8v-2zm0 4h8v2h-8v-2zm0 4h6v2h-6v-2z" fill="white"/>
+                    </svg>
+                    <span class="logo-text">Skill Swap</span>
+                </a>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <div class="nav-links desktop-nav">
+                <a href="/" class="nav-link" data-page="home">Browse Skills</a>
+                <a href="/dashboard" class="nav-link" data-page="dashboard">Dashboard</a>
+                <a href="/messages" class="nav-link" data-page="messages">
+                    Messages
+                    <span id="unread-messages-badge" class="badge hidden">0</span>
+                </a>
+                <a href="/profile" class="nav-link" data-page="profile">Profile</a>
+            </div>
+
+            <!-- User Menu -->
+            <div class="nav-user">
+                <!-- Not authenticated -->
+                <div id="auth-buttons" class="auth-buttons">
+                    <button class="btn btn-secondary" onclick="showLoginModal()">Sign In</button>
+                    <button class="btn btn-primary" onclick="showRegisterModal()">Get Started</button>
+                </div>
+
+                <!-- Authenticated -->
+                <div id="user-menu" class="user-menu hidden">
+                    <div class="notification-bell">
+                        <button id="notifications-btn" class="btn-icon" onclick="toggleNotifications()">
+                            <i data-lucide="bell"></i>
+                            <span id="notifications-badge" class="badge hidden">0</span>
+                        </button>
+                        <div id="notifications-dropdown" class="dropdown-menu hidden">
+                            <div class="dropdown-header">
+                                <h3>Notifications</h3>
+                                <button class="btn-text" onclick="markAllNotificationsRead()">Mark all read</button>
+                            </div>
+                            <div id="notifications-list" class="notifications-list">
+                                <div class="empty-state">
+                                    <p>No notifications yet</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="user-dropdown">
+                        <button class="user-avatar-btn" onclick="toggleUserDropdown()">
+                            <img id="user-avatar" src="" alt="User Avatar" class="user-avatar">
+                            <span id="user-name" class="user-name"></span>
+                            <i data-lucide="chevron-down"></i>
+                        </button>
+                        <div id="user-dropdown-menu" class="dropdown-menu hidden">
+                            <a href="/profile" class="dropdown-item">
+                                <i data-lucide="user"></i>
+                                Profile
+                            </a>
+                            <a href="/dashboard" class="dropdown-item">
+                                <i data-lucide="layout-dashboard"></i>
+                                Dashboard
+                            </a>
+                            <a href="/subscription" class="dropdown-item">
+                                <i data-lucide="crown"></i>
+                                Subscription
+                                <span id="user-tier-badge" class="tier-badge">Free</span>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <button class="dropdown-item" onclick="logout()">
+                                <i data-lucide="log-out"></i>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <button id="mobile-menu-toggle" class="mobile-menu-toggle">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Mobile Navigation -->
+        <div id="mobile-nav" class="mobile-nav hidden">
+            <div class="mobile-nav-links">
+                <a href="/" class="mobile-nav-link" data-page="home">
+                    <i data-lucide="search"></i>
+                    Browse Skills
+                </a>
+                <a href="/dashboard" class="mobile-nav-link" data-page="dashboard">
+                    <i data-lucide="layout-dashboard"></i>
+                    Dashboard
+                </a>
+                <a href="/messages" class="mobile-nav-link" data-page="messages">
+                    <i data-lucide="message-circle"></i>
+                    Messages
+                    <span id="mobile-unread-badge" class="badge hidden">0</span>
+                </a>
+                <a href="/profile" class="mobile-nav-link" data-page="profile">
+                    <i data-lucide="user"></i>
+                    Profile
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="main-content">
+        <!-- Content will be dynamically loaded here -->
+        <div id="page-content" class="page-content">
+            <!-- Landing page will load by default -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer" class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Skill Swap</h4>
+                <p>Share your skills, learn from others, and grow together.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Platform</h4>
+                <ul>
+                    <li><a href="/">Browse Skills</a></li>
+                    <li><a href="/how-it-works">How it Works</a></li>
+                    <li><a href="/pricing">Pricing</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="/help">Help Center</a></li>
+                    <li><a href="/contact">Contact Us</a></li>
+                    <li><a href="/safety">Safety</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="/terms">Terms of Service</a></li>
+                    <li><a href="/privacy">Privacy Policy</a></li>
+                    <li><a href="/cookies">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Skill Swap. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modal Container -->
+    <div id="modal-container" class="modal-container"></div>
+
+    <!-- Login Modal Template -->
+    <template id="login-modal-template">
+        <div class="modal-backdrop" onclick="closeModal()">
+            <div class="modal" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h2>Sign In to Skill Swap</h2>
+                    <button class="btn-close" onclick="closeModal()">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="login-form" onsubmit="handleLogin(event)">
+                        <div class="form-group">
+                            <label for="login-email">Email Address</label>
+                            <input type="email" id="login-email" name="email" required 
+                                   placeholder="Enter your email">
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" name="password" required 
+                                   placeholder="Enter your password">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-full">
+                                Sign In
+                            </button>
+                        </div>
+                    </form>
+                    <div class="modal-footer">
+                        <p>Don't have an account? 
+                            <button class="btn-link" onclick="showRegisterModal()">Sign up here</button>
+                        </p>
+                        <button class="btn-link" onclick="showForgotPasswordModal()">
+                            Forgot your password?
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Register Modal Template -->
+    <template id="register-modal-template">
+        <div class="modal-backdrop" onclick="closeModal()">
+            <div class="modal" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h2>Join Skill Swap</h2>
+                    <button class="btn-close" onclick="closeModal()">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="register-form" onsubmit="handleRegister(event)">
+                        <div class="form-group">
+                            <label for="register-name">Full Name</label>
+                            <input type="text" id="register-name" name="name" required 
+                                   placeholder="Enter your full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-email">Email Address</label>
+                            <input type="email" id="register-email" name="email" required 
+                                   placeholder="Enter your email address">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password">Password</label>
+                            <input type="password" id="register-password" name="password" required 
+                                   placeholder="Create a strong password" minlength="8">
+                            <small class="form-hint">Must be at least 8 characters with uppercase, lowercase, number, and special character</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="terms-checkbox" required>
+                                <span class="checkmark"></span>
+                                I agree to the <a href="/terms" target="_blank">Terms of Service</a> 
+                                and <a href="/privacy" target="_blank">Privacy Policy</a>
+                            </label>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-full">
+                                Create Account
+                            </button>
+                        </div>
+                    </form>
+                    <div class="modal-footer">
+                        <p>Already have an account? 
+                            <button class="btn-link" onclick="showLoginModal()">Sign in here</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- JavaScript -->
+    <script src="/js/components/ApiClient.js"></script>
+    <script src="/js/components/NotificationManager.js"></script>
+    <script src="/js/components/SocketManager.js"></script>
+    <script src="/js/components/UIManager.js"></script>
+    <script src="/js/components/Router.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/messaging.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>
