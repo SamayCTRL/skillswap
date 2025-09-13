@@ -48,6 +48,7 @@ const authMiddleware = async (req, res, next) => {
             email: user.email,
             name: user.name,
             subscriptionTier: user.subscription_tier,
+            role: user.role || 'user',
             verified: user.verified
         };
 
@@ -104,6 +105,7 @@ const optionalAuthMiddleware = async (req, res, next) => {
                 email: user.email,
                 name: user.name,
                 subscriptionTier: user.subscription_tier,
+                role: user.role || 'user',
                 verified: user.verified
             };
         } else {
@@ -127,8 +129,8 @@ const adminMiddleware = async (req, res, next) => {
             });
         }
 
-        // Check if user is admin (in production, you'd have a proper role system)
-        const isAdmin = req.user.email === 'admin@skillswap.com';
+        // Check if user has admin role
+        const isAdmin = req.user.role === 'admin';
         
         if (!isAdmin) {
             return res.status(403).json({

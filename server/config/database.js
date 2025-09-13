@@ -91,7 +91,7 @@ const dbUtils = {
     // Get user by ID with error handling
     getUserById: async (userId) => {
         const result = await query(
-            'SELECT id, email, name, bio, avatar_url, subscription_tier, verified, credits, created_at FROM users WHERE id = $1',
+            'SELECT id, email, name, bio, avatar_url, subscription_tier, role, verified, credits, created_at FROM users WHERE id = $1',
             [userId]
         );
         return result.rows[0];
