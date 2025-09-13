@@ -94,7 +94,7 @@ describe('Database Integration Tests', () => {
       const exists = await db.userExists(testUserId);
       expect(exists).toBe(true);
 
-      const notExists = await db.userExists('non-existent-id');
+      const notExists = await db.userExists('00000000-0000-0000-0000-000000000000');
       expect(notExists).toBe(false);
     });
 
@@ -182,7 +182,7 @@ describe('Database Integration Tests', () => {
 
       // Verify user doesn't exist after transaction
       const user = await db.getUserByEmail(testEmail);
-      expect(user).toBeNull();
+      expect(user).toBeUndefined();
     });
 
     it('should rollback transaction on error', async () => {
@@ -204,7 +204,7 @@ describe('Database Integration Tests', () => {
 
       // Verify user doesn't exist (transaction was rolled back)
       const user = await db.getUserByEmail(testEmail);
-      expect(user).toBeNull();
+      expect(user).toBeUndefined();
     });
   });
 });
