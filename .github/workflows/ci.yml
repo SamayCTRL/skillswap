@@ -52,6 +52,12 @@ jobs:
         echo "JWT_SECRET=test-jwt-secret-for-ci" >> .env.test
         echo "JWT_REFRESH_SECRET=test-refresh-secret-for-ci" >> .env.test
 
+    - name: Setup test database schema
+      run: |
+        PGPASSWORD=postgres psql -h localhost -U postgres -d skill_swap_test -f server/models/database.sql
+      env:
+        NODE_ENV: test
+
     - name: Run unit tests
       run: npm run test:unit
       env:

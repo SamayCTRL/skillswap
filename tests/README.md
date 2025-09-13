@@ -56,12 +56,33 @@ This project includes a comprehensive testing suite covering unit tests, integra
 
 ### Database Setup for Tests
 
+**Note**: Integration tests require PostgreSQL setup. If database is not available, integration tests will be skipped.
+
 ```bash
-# Create test database
+# 1. Install PostgreSQL (if not already installed)
+# macOS: brew install postgresql
+# Ubuntu: sudo apt-get install postgresql
+
+# 2. Start PostgreSQL service
+# macOS: brew services start postgresql
+# Ubuntu: sudo service postgresql start
+
+# 3. Create test database
 createdb skill_swap_test
 
-# Run database setup with test environment
-NODE_ENV=test npm run setup
+# 4. Setup database schema
+PGPASSWORD=postgres psql -h localhost -U postgres -d skill_swap_test -f server/models/database.sql
+
+# 5. Run integration tests
+npm run test:integration
+```
+
+**Alternative: Run only unit tests**
+```bash
+# Skip database-dependent tests
+npm test
+# or
+npm run test:unit
 ```
 
 ## Running Tests

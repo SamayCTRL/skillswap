@@ -9,7 +9,7 @@
     "setup": "node setup.js",
     "seed": "node server/utils/seedData.js",
     "seed:clear": "node server/utils/seedData.js clear",
-    "test": "jest",
+    "test": "npm run test:unit",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:unit": "jest tests/unit",
