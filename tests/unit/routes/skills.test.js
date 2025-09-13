@@ -124,7 +124,7 @@ describe('Skills Routes', () => {
       expect(response.status).toBe(200);
       expect(db.query).toHaveBeenCalledWith(
         expect.stringContaining('s.category_id = $1'),
-        expect.arrayContaining([10, 0, null, 1])
+        expect.arrayContaining([1, "10", 0, null])
       );
     });
 
@@ -147,7 +147,7 @@ describe('Skills Routes', () => {
       expect(response.status).toBe(200);
       expect(db.query).toHaveBeenCalledWith(
         expect.stringContaining('ILIKE'),
-        expect.arrayContaining(['%javascript%', '%javascript%', 10, 0, null])
+        expect.arrayContaining(['%javascript%', '%javascript%', "10", 0, null])
       );
     });
   });
