@@ -12,6 +12,72 @@ class AuthManager {
         }
     }
     
+    // Google OAuth login
+    async googleLogin(credential) {
+        try {
+            const response = await this.api.post('/auth/google-login', {
+                credential
+            });
+            
+            // Store tokens and user data
+            this.token = response.tokens.accessToken;
+            this.refreshToken = response.tokens.refreshToken;
+            this.user = response.user;
+            
+            // Save to localStorage
+            localStorage.setItem('accessToken', this.token);
+            localStorage.setItem('refreshToken', this.refreshToken);
+            
+            // Set auth token for API client
+            this.api.setAuthToken(this.token);
+            
+            return {
+                success: true,
+                user: this.user
+            };
+            
+        } catch (error) {
+            console.error('Google login error:', error);
+            return {
+                success: false,
+                error: error.message || 'Google login failed'
+            };
+        }
+    }
+    
+    // Google OAuth registration
+    async googleRegister(credential) {
+        try {
+            const response = await this.api.post('/auth/google-register', {
+                credential
+            });
+            
+            // Store tokens and user data
+            this.token = response.tokens.accessToken;
+            this.refreshToken = response.tokens.refreshToken;
+            this.user = response.user;
+            
+            // Save to localStorage
+            localStorage.setItem('accessToken', this.token);
+            localStorage.setItem('refreshToken', this.refreshToken);
+            
+            // Set auth token for API client
+            this.api.setAuthToken(this.token);
+            
+            return {
+                success: true,
+                user: this.user
+            };
+            
+        } catch (error) {
+            console.error('Google registration error:', error);
+            return {
+                success: false,
+                error: error.message || 'Google registration failed'
+            };
+        }
+    }
+    
     // Check if user is authenticated
     isAuthenticated() {
         return !!this.token && !!this.user;
@@ -49,4 +115,164 @@ class AuthManager {
             
             // Clear invalid tokens
             this.clearTokens();
-            return false;\n        }\n    }\n    \n    // Login user\n    async login(email, password) {\n        try {\n            const response = await this.api.post('/auth/login', {\n                email,\n                password\n            });\n            \n            // Store tokens and user data\n            this.token = response.tokens.accessToken;\n            this.refreshToken = response.tokens.refreshToken;\n            this.user = response.user;\n            \n            // Save to localStorage\n            localStorage.setItem('accessToken', this.token);\n            localStorage.setItem('refreshToken', this.refreshToken);\n            \n            // Set auth token for API client\n            this.api.setAuthToken(this.token);\n            \n            return {\n                success: true,\n                user: this.user\n            };\n            \n        } catch (error) {\n            console.error('Login error:', error);\n            return {\n                success: false,\n                error: error.message || 'Login failed'\n            };\n        }\n    }\n    \n    // Register new user\n    async register(name, email, password) {\n        try {\n            const response = await this.api.post('/auth/register', {\n                name,\n                email,\n                password\n            });\n            \n            // Store tokens and user data\n            this.token = response.tokens.accessToken;\n            this.refreshToken = response.tokens.refreshToken;\n            this.user = response.user;\n            \n            // Save to localStorage\n            localStorage.setItem('accessToken', this.token);\n            localStorage.setItem('refreshToken', this.refreshToken);\n            \n            // Set auth token for API client\n            this.api.setAuthToken(this.token);\n            \n            return {\n                success: true,\n                user: this.user\n            };\n            \n        } catch (error) {\n            console.error('Registration error:', error);\n            return {\n                success: false,\n                error: error.message || 'Registration failed'\n            };\n        }\n    }\n    \n    // Refresh authentication token\n    async refreshAuthToken() {\n        if (!this.refreshToken) {\n            return false;\n        }\n        \n        try {\n            const response = await this.api.post('/auth/refresh', {\n                refreshToken: this.refreshToken\n            });\n            \n            // Update tokens\n            this.token = response.tokens.accessToken;\n            this.refreshToken = response.tokens.refreshToken;\n            \n            // Save to localStorage\n            localStorage.setItem('accessToken', this.token);\n            localStorage.setItem('refreshToken', this.refreshToken);\n            \n            // Set auth token for API client\n            this.api.setAuthToken(this.token);\n            \n            return true;\n            \n        } catch (error) {\n            console.error('Token refresh error:', error);\n            this.clearTokens();\n            return false;\n        }\n    }\n    \n    // Logout user\n    async logout() {\n        try {\n            // Call logout endpoint if authenticated\n            if (this.token) {\n                await this.api.post('/auth/logout');\n            }\n        } catch (error) {\n            console.error('Logout error:', error);\n        } finally {\n            // Clear tokens and user data regardless of API call result\n            this.clearTokens();\n        }\n    }\n    \n    // Request password reset\n    async requestPasswordReset(email) {\n        try {\n            await this.api.post('/auth/forgot-password', { email });\n            return {\n                success: true,\n                message: 'If an account with that email exists, a password reset link has been sent.'\n            };\n        } catch (error) {\n            console.error('Password reset request error:', error);\n            return {\n                success: false,\n                error: error.message || 'Failed to send password reset email'\n            };\n        }\n    }\n    \n    // Reset password with token\n    async resetPassword(token, newPassword) {\n        try {\n            await this.api.post('/auth/reset-password', {\n                token,\n                newPassword\n            });\n            \n            return {\n                success: true,\n                message: 'Password reset successfully'\n            };\n        } catch (error) {\n            console.error('Password reset error:', error);\n            return {\n                success: false,\n                error: error.message || 'Failed to reset password'\n            };\n        }\n    }\n    \n    // Change password (authenticated user)\n    async changePassword(currentPassword, newPassword) {\n        try {\n            await this.api.post('/auth/change-password', {\n                currentPassword,\n                newPassword\n            });\n            \n            return {\n                success: true,\n                message: 'Password changed successfully'\n            };\n        } catch (error) {\n            console.error('Password change error:', error);\n            return {\n                success: false,\n                error: error.message || 'Failed to change password'\n            };\n        }\n    }\n    \n    // Update user profile\n    async updateProfile(profileData) {\n        try {\n            const response = await this.api.put('/users/profile', profileData);\n            \n            // Update local user data\n            this.user = { ...this.user, ...response.user };\n            \n            return {\n                success: true,\n                user: this.user\n            };\n        } catch (error) {\n            console.error('Profile update error:', error);\n            return {\n                success: false,\n                error: error.message || 'Failed to update profile'\n            };\n        }\n    }\n    \n    // Upload user avatar\n    async uploadAvatar(file) {\n        try {\n            const formData = new FormData();\n            formData.append('avatar', file);\n            \n            const response = await this.api.post('/users/avatar', formData, {\n                headers: {\n                    'Content-Type': 'multipart/form-data'\n                }\n            });\n            \n            // Update local user avatar URL\n            if (this.user) {\n                this.user.avatar_url = response.avatar_url;\n            }\n            \n            return {\n                success: true,\n                avatar_url: response.avatar_url\n            };\n        } catch (error) {\n            console.error('Avatar upload error:', error);\n            return {\n                success: false,\n                error: error.message || 'Failed to upload avatar'\n            };\n        }\n    }\n    \n    // Delete user avatar\n    async deleteAvatar() {\n        try {\n            await this.api.delete('/users/avatar');\n            \n            // Update local user data\n            if (this.user) {\n                this.user.avatar_url = null;\n            }\n            \n            return {\n                success: true\n            };\n        } catch (error) {\n            console.error('Avatar deletion error:', error);\n            return {\n                success: false,\n                error: error.message || 'Failed to delete avatar'\n            };\n        }\n    }\n    \n    // Get user subscription info\n    async getSubscriptionInfo() {\n        try {\n            const response = await this.api.get('/subscriptions/current');\n            return {\n                success: true,\n                subscription: response.subscription,\n                limits: response.limits,\n                usage: response.usage,\n                pricing: response.pricing\n            };\n        } catch (error) {\n            console.error('Get subscription info error:', error);\n            return {\n                success: false,\n                error: error.message || 'Failed to get subscription info'\n            };\n        }\n    }\n    \n    // Upgrade subscription\n    async upgradeSubscription(tier, billingCycle = 'monthly') {\n        try {\n            const response = await this.api.post('/subscriptions/upgrade', {\n                tier,\n                billing_cycle: billingCycle\n            });\n            \n            // Update local user tier\n            if (this.user) {\n                this.user.subscriptionTier = tier;\n            }\n            \n            return {\n                success: true,\n                tier: response.tier,\n                amount: response.amount\n            };\n        } catch (error) {\n            console.error('Subscription upgrade error:', error);\n            return {\n                success: false,\n                error: error.message || 'Failed to upgrade subscription'\n            };\n        }\n    }\n    \n    // Cancel subscription\n    async cancelSubscription() {\n        try {\n            await this.api.post('/subscriptions/cancel');\n            \n            // Update local user tier\n            if (this.user) {\n                this.user.subscriptionTier = 'free';\n            }\n            \n            return {\n                success: true\n            };\n        } catch (error) {\n            console.error('Subscription cancellation error:', error);\n            return {\n                success: false,\n                error: error.message || 'Failed to cancel subscription'\n            };\n        }\n    }\n    \n    // Check if user has permission for a feature\n    hasPermission(feature) {\n        if (!this.user) return false;\n        \n        const tierFeatures = {\n            free: ['basic_profile', 'browse_skills'],\n            basic: ['basic_profile', 'browse_skills', 'unlimited_messaging', 'booking_requests', 'calendar_integration'],\n            pro: ['basic_profile', 'browse_skills', 'unlimited_messaging', 'booking_requests', 'calendar_integration', 'verified_badge', 'skill_monetization', 'earnings_dashboard'],\n            premium: ['basic_profile', 'browse_skills', 'unlimited_messaging', 'booking_requests', 'calendar_integration', 'verified_badge', 'skill_monetization', 'earnings_dashboard', 'featured_listings', 'advanced_analytics', 'priority_support']\n        };\n        \n        const userFeatures = tierFeatures[this.user.subscriptionTier] || tierFeatures.free;\n        return userFeatures.includes(feature);\n    }\n    \n    // Clear all authentication data\n    clearTokens() {\n        this.token = null;\n        this.refreshToken = null;\n        this.user = null;\n        \n        // Clear localStorage\n        localStorage.removeItem('accessToken');\n        localStorage.removeItem('refreshToken');\n        \n        // Clear API client token\n        this.api.setAuthToken(null);\n    }\n    \n    // Handle token expiration\n    async handleTokenExpiration() {\n        const refreshed = await this.refreshAuthToken();\n        if (!refreshed) {\n            // Force logout if refresh fails\n            this.clearTokens();\n            \n            // Redirect to login if needed\n            if (window.SkillSwap && window.SkillSwap.router) {\n                window.SkillSwap.router.navigate('/login');\n            }\n            \n            // Show notification\n            if (window.SkillSwap && window.SkillSwap.notifications) {\n                window.SkillSwap.notifications.show('Your session has expired. Please log in again.', 'warning');\n            }\n        }\n        return refreshed;\n    }\n    \n    // Set up automatic token refresh\n    setupTokenRefresh() {\n        // Refresh token 5 minutes before it expires\n        const refreshInterval = 19 * 60 * 1000; // 19 minutes for 24-hour token\n        \n        setInterval(async () => {\n            if (this.isAuthenticated()) {\n                await this.refreshAuthToken();\n            }\n        }, refreshInterval);\n    }\n    \n    // Handle authentication errors globally\n    handleAuthError(error) {\n        if (error.status === 401) {\n            // Token expired or invalid\n            this.handleTokenExpiration();\n        }\n    }\n}
+            return false;
+        }
+    }
+    
+    // Login user
+    async login(email, password) {
+        try {
+            const response = await this.api.post('/auth/login', {
+                email,
+                password
+            });
+            
+            // Store tokens and user data
+            this.token = response.tokens.accessToken;
+            this.refreshToken = response.tokens.refreshToken;
+            this.user = response.user;
+            
+            // Save to localStorage
+            localStorage.setItem('accessToken', this.token);
+            localStorage.setItem('refreshToken', this.refreshToken);
+            
+            // Set auth token for API client
+            this.api.setAuthToken(this.token);
+            
+            return {
+                success: true,
+                user: this.user
+            };
+            
+        } catch (error) {
+            console.error('Login error:', error);
+            return {
+                success: false,
+                error: error.message || 'Login failed'
+            };
+        }
+    }
+    
+    // Register new user
+    async register(name, email, password) {
+        try {
+            const response = await this.api.post('/auth/register', {
+                name,
+                email,
+                password
+            });
+            
+            // Store tokens and user data
+            this.token = response.tokens.accessToken;
+            this.refreshToken = response.tokens.refreshToken;
+            this.user = response.user;
+            
+            // Save to localStorage
+            localStorage.setItem('accessToken', this.token);
+            localStorage.setItem('refreshToken', this.refreshToken);
+            
+            // Set auth token for API client
+            this.api.setAuthToken(this.token);
+            
+            return {
+                success: true,
+                user: this.user
+            };
+            
+        } catch (error) {
+            console.error('Registration error:', error);
+            return {
+                success: false,
+                error: error.message || 'Registration failed'
+            };
+        }
+    }
+    
+    // Refresh authentication token
+    async refreshAuthToken() {
+        if (!this.refreshToken) {
+            return false;
+        }
+        
+        try {
+            const response = await this.api.post('/auth/refresh', {
+                refreshToken: this.refreshToken
+            });
+            
+            // Update tokens
+            this.token = response.tokens.accessToken;
+            this.refreshToken = response.tokens.refreshToken;
+            
+            // Save to localStorage
+            localStorage.setItem('accessToken', this.token);
+            localStorage.setItem('refreshToken', this.refreshToken);
+            
+            // Set auth token for API client
+            this.api.setAuthToken(this.token);
+            
+            return true;
+            
+        } catch (error) {
+            console.error('Token refresh error:', error);
+            this.clearTokens();
+            return false;
+        }
+    }
+    
+    // Logout user
+    async logout() {
+        try {
+            // Call logout endpoint if authenticated
+            if (this.token) {
+                await this.api.post('/auth/logout');
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+        } finally {
+            // Clear tokens and user data regardless of API call result
+            this.clearTokens();
+        }
+    }
+    
+    // Clear all authentication data
+    clearTokens() {
+        this.token = null;
+        this.refreshToken = null;
+        this.user = null;
+        
+        // Clear localStorage
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        
+        // Clear API client token
+        this.api.setAuthToken(null);
+    }
+    
+    // Handle token expiration
+    async handleTokenExpiration() {
+        const refreshed = await this.refreshAuthToken();
+        if (!refreshed) {
+            // Force logout if refresh fails
+            this.clearTokens();
+            
+            // Redirect to login if needed
+            if (window.SkillSwap && window.SkillSwap.router) {
+                window.SkillSwap.router.navigate('/login');
+            }
+            
+            // Show notification
+            if (window.SkillSwap && window.SkillSwap.notifications) {
+                window.SkillSwap.notifications.show('Your session has expired. Please log in again.', 'warning');
+            }
+        }
+        return refreshed;
+    }
+    
+    // Handle authentication errors globally
+    handleAuthError(error) {
+        if (error.status === 401) {
+            // Token expired or invalid
+            this.handleTokenExpiration();
+        }
+    }
+}

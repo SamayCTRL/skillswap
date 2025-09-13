@@ -1,19 +1,19 @@
-// API Client for handling HTTP requests
+// API Client for making HTTP requests
 class ApiClient {
-    constructor(baseURL) {
+    constructor(baseURL = '/api') {
         this.baseURL = baseURL;
         this.authToken = null;
         this.defaultHeaders = {
             'Content-Type': 'application/json'
         };
     }
-    
+
     // Set authentication token
     setAuthToken(token) {
         this.authToken = token;
     }
-    
-    // Get headers with auth token
+
+    // Get authentication headers
     getHeaders(customHeaders = {}) {
         const headers = { ...this.defaultHeaders, ...customHeaders };
         
@@ -23,143 +23,120 @@ class ApiClient {
         
         return headers;
     }
-    
-    // Handle HTTP responses
-    async handleResponse(response) {
-        const contentType = response.headers.get('content-type');
-        
-        let data;
-        if (contentType && contentType.includes('application/json')) {
-            data = await response.json();
-        } else {
-            data = await response.text();
-        }
-        
-        if (!response.ok) {
-            const error = new Error(data.error || data.message || `HTTP ${response.status}`);
-            error.status = response.status;
-            error.data = data;
-            throw error;
-        }
-        
-        return data;
-    }
-    
-    // Generic request method
-    async request(endpoint, options = {}) {
-        const url = `${this.baseURL}${endpoint}`;
-        const config = {
-            headers: this.getHeaders(options.headers),
-            ...options
-        };
-        
-        // Don't stringify FormData
-        if (config.body && !(config.body instanceof FormData)) {
-            config.body = JSON.stringify(config.body);
-        }
-        
+
+    // Make HTTP request
+    async request(method, url, data = null, options = {}) {
         try {
-            const response = await fetch(url, config);
-            return await this.handleResponse(response);
-        } catch (error) {
-            // Handle network errors
-            if (error.name === 'TypeError' && error.message.includes('fetch')) {
-                throw new Error('Network error. Please check your connection.');
+            const config = {
+                method: method.toUpperCase(),
+                headers: this.getHeaders(options.headers),
+                ...options
+            };
+
+            // Add body for non-GET requests
+            if (data && method.toUpperCase() !== 'GET') {
+                if (data instanceof FormData) {
+                    // Don't set Content-Type for FormData, let browser set it
+                    delete config.headers['Content-Type'];
+                    config.body = data;
+                } else {
+                    config.body = JSON.stringify(data);
+                }
             }
+
+            // Add query parameters for GET requests
+            if (data && method.toUpperCase() === 'GET') {
+                const params = new URLSearchParams(data);
+                url += `?${params.toString()}`;
+            }
+
+            const response = await fetch(`${this.baseURL}${url}`, config);
+            
+            // Handle different response types
+            let responseData;
+            const contentType = response.headers.get('content-type');
+            
+            if (contentType && contentType.includes('application/json')) {
+                responseData = await response.json();
+            } else {
+                responseData = await response.text();
+            }
+
+            if (!response.ok) {
+                throw new Error(responseData.error || responseData.message || `HTTP ${response.status}`);
+            }
+
+            return responseData;
+        } catch (error) {
+            console.error(`API request failed: ${method} ${url}`, error);
             throw error;
         }
     }
-    
-    // GET request
-    async get(endpoint, params = {}) {
-        const queryString = new URLSearchParams(params).toString();
-        const url = queryString ? `${endpoint}?${queryString}` : endpoint;
-        
-        return this.request(url, {
-            method: 'GET'
-        });
+
+    // Convenience methods
+    async get(url, params = null, options = {}) {
+        return this.request('GET', url, params, options);
     }
-    
-    // POST request
-    async post(endpoint, body = null, options = {}) {
-        return this.request(endpoint, {
-            method: 'POST',
-            body,
-            ...options
-        });
+
+    async post(url, data = null, options = {}) {
+        return this.request('POST', url, data, options);
     }
-    
-    // PUT request
-    async put(endpoint, body = null, options = {}) {
-        return this.request(endpoint, {
-            method: 'PUT',
-            body,
-            ...options
-        });
+
+    async put(url, data = null, options = {}) {
+        return this.request('PUT', url, data, options);
     }
-    
-    // PATCH request
-    async patch(endpoint, body = null, options = {}) {
-        return this.request(endpoint, {
-            method: 'PATCH',
-            body,
-            ...options
-        });
+
+    async patch(url, data = null, options = {}) {
+        return this.request('PATCH', url, data, options);
     }
-    
-    // DELETE request
-    async delete(endpoint, options = {}) {
-        return this.request(endpoint, {
-            method: 'DELETE',
-            ...options
-        });
+
+    async delete(url, options = {}) {
+        return this.request('DELETE', url, null, options);
     }
-    
-    // Upload file
-    async upload(endpoint, file, progressCallback = null) {
-        const formData = new FormData();
-        formData.append('file', file);
-        
+
+    // Upload file with progress tracking
+    uploadFile(url, file, onProgress = null) {
         return new Promise((resolve, reject) => {
+            const formData = new FormData();
+            formData.append('file', file);
+
             const xhr = new XMLHttpRequest();
-            
-            // Set up progress tracking
-            if (progressCallback) {
+
+            // Track upload progress
+            if (onProgress) {
                 xhr.upload.addEventListener('progress', (event) => {
                     if (event.lengthComputable) {
                         const percentComplete = (event.loaded / event.total) * 100;
-                        progressCallback(percentComplete);
+                        onProgress(percentComplete);
                     }
                 });
             }
-            
+
             xhr.addEventListener('load', () => {
                 if (xhr.status >= 200 && xhr.status < 300) {
                     try {
                         const response = JSON.parse(xhr.responseText);
                         resolve(response);
-                    } catch (e) {
+                    } catch (error) {
                         resolve(xhr.responseText);
                     }
                 } else {
-                    try {
-                        const error = JSON.parse(xhr.responseText);
-                        reject(new Error(error.error || error.message || `HTTP ${xhr.status}`));
-                    } catch (e) {
-                        reject(new Error(`HTTP ${xhr.status}`));
-                    }
+                    reject(new Error(`Upload failed: ${xhr.status}`));
                 }
             });
-            
+
             xhr.addEventListener('error', () => {
-                reject(new Error('Network error'));
+                reject(new Error('Upload failed'));
             });
+
+            xhr.open('POST', `${this.baseURL}${url}`);
             
-            xhr.open('POST', `${this.baseURL}${endpoint}`);
-            
-            // Set auth header
+            // Add auth header if available
             if (this.authToken) {
                 xhr.setRequestHeader('Authorization', `Bearer ${this.authToken}`);
             }
             
-            xhr.send(formData);\n        });\n    }\n}
+            xhr.send(formData);
+        });
+    }
+}

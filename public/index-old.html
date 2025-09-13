@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Swap - Share Your Skills, Learn from Others</title>
+    <meta name="description" content="A marketplace for sharing skills and learning from experts. Connect, learn, and grow with Skill Swap.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    
+    <!-- Inline CSS Fallback for Critical Styles -->
+    <style>
+        /* Critical inline styles to ensure page works even if CSS files fail to load */
+        body {
+            margin: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            margin: 4px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: #3B82F6;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6B7280;
+            color: white;
+        }
+        .btn-success {
+            background: #10B981;
+            color: white;
+        }
+        .btn-info {
+            background: #06B6D4;
+            color: white;
+        }
+        .btn-warning {
+            background: #F59E0B;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        .hero-content {
+            text-align: center;
+            padding: 60px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .hero-content h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #1F2937;
+        }
+        .hero-content p {
+            font-size: 1.2rem;
+            color: #6B7280;
+            margin-bottom: 2rem;
+        }
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .loading-spinner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3B82F6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .hidden {
+            display: none !important;
+        }
+        /* Error message styling */
+        .error-message {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            background: #EF4444;
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            z-index: 10000;
+            font-weight: 500;
+        }
+    </style>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js">
+    
+    <!-- Socket.io -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    
+    <!-- Jitsi Meet API -->
+    <script src="https://meet.jit.si/external_api.js"></script>
+    
+    <!-- Google OAuth -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading Skill Swap...</p>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Header -->
+    <header id="header" class="header">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <a href="/" class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="16" cy="16" r="16" fill="#3B82F6"/>
+                        <path d="M12 10h8v2h-8v-2zm0 4h8v2h-8v-2zm0 4h6v2h-6v-2z" fill="white"/>
+                    </svg>
+                    <span class="logo-text">Skill Swap</span>
+                </a>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <div class="nav-links desktop-nav">
+                <a href="/" class="nav-link" data-page="home">Home</a>
+                <a href="/browse" class="nav-link" data-page="browse">Browse Skills</a>
+                <a href="/dashboard" class="nav-link" data-page="dashboard">Dashboard</a>
+                <a href="/messages" class="nav-link" data-page="messages">
+                    Messages
+                    <span id="unread-messages-badge" class="badge hidden">0</span>
+                </a>
+            </div>
+
+            <!-- User Menu -->
+            <div class="nav-user">
+                <!-- Not authenticated -->
+                <div id="auth-buttons" class="auth-buttons">
+                    <button class="btn btn-secondary" onclick="showLoginModal()">Sign In</button>
+                    <button class="btn btn-primary" onclick="showRegisterModal()">Get Started</button>
+                </div>
+
+                <!-- Authenticated -->
+                <div id="user-menu" class="user-menu hidden">
+                    <div class="notification-bell">
+                        <button id="notifications-btn" class="btn-icon" onclick="toggleNotifications()">
+                            <i data-lucide="bell"></i>
+                            <span id="notifications-badge" class="badge hidden">0</span>
+                        </button>
+                        <div id="notifications-dropdown" class="dropdown-menu hidden">
+                            <div class="dropdown-header">
+                                <h3>Notifications</h3>
+                                <button class="btn-text" onclick="markAllNotificationsRead()">Mark all read</button>
+                            </div>
+                            <div id="notifications-list" class="notifications-list">
+                                <div class="empty-state">
+                                    <p>No notifications yet</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="user-dropdown">
+                        <button class="user-avatar-btn" onclick="toggleUserDropdown()">
+                            <img id="user-avatar" src="" alt="User Avatar" class="user-avatar">
+                            <span id="user-name" class="user-name"></span>
+                            <i data-lucide="chevron-down"></i>
+                        </button>
+                        <div id="user-dropdown-menu" class="dropdown-menu hidden">
+                            <a href="/profile" class="dropdown-item">
+                                <i data-lucide="user"></i>
+                                Profile
+                            </a>
+                            <a href="/my-skills" class="dropdown-item">
+                                <i data-lucide="book-open"></i>
+                                My Skills
+                            </a>
+                            <a href="/bookings" class="dropdown-item">
+                                <i data-lucide="calendar"></i>
+                                Bookings
+                            </a>
+                            <a href="/settings" class="dropdown-item">
+                                <i data-lucide="settings"></i>
+                                Settings
+                            </a>
+                            <a href="/subscription" class="dropdown-item">
+                                <i data-lucide="crown"></i>
+                                Subscription
+                                <span id="user-tier-badge" class="tier-badge">Free</span>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <button class="dropdown-item" onclick="logout()">
+                                <i data-lucide="log-out"></i>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <button id="mobile-menu-toggle" class="mobile-menu-toggle">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Mobile Navigation -->
+        <div id="mobile-nav" class="mobile-nav hidden">
+            <div class="mobile-nav-links">
+                <a href="/" class="mobile-nav-link" data-page="home">
+                    <i data-lucide="home"></i>
+                    Home
+                </a>
+                <a href="/browse" class="mobile-nav-link" data-page="browse">
+                    <i data-lucide="search"></i>
+                    Browse Skills
+                </a>
+                <a href="/dashboard" class="mobile-nav-link" data-page="dashboard">
+                    <i data-lucide="layout-dashboard"></i>
+                    Dashboard
+                </a>
+                <a href="/messages" class="mobile-nav-link" data-page="messages">
+                    <i data-lucide="message-circle"></i>
+                    Messages
+                    <span id="mobile-unread-badge" class="badge hidden">0</span>
+                </a>
+                <a href="/profile" class="mobile-nav-link" data-page="profile">
+                    <i data-lucide="user"></i>
+                    Profile
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="main-content">
+        <!-- Content will be dynamically loaded here -->
+        <div id="page-content" class="page-content">
+            <!-- Landing page will load by default -->
+            <div class="hero-section">
+                <div class="hero-content">
+                    <h1>Share Your Skills, Learn from Others</h1>
+                    <p>Join our community of skilled professionals and learners. Share what you know, learn what you need - completely free! Upgrade to verified status to monetize your top-rated skills.</p>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary btn-lg" onclick="window.location.href='/dashboard?register=true'">Get Started Free</button>
+                        <button class="btn btn-secondary btn-lg" onclick="window.location.href='/dashboard?login=true'">Sign In</button>
+                        <!-- Ultra-Simple Debug Buttons -->
+                        <button class="btn btn-info" onclick="window.location.href='/browse'">🔧 Test Browse</button>
+                        <button class="btn btn-info" onclick="window.location.href='/dashboard'">🔧 Test Dashboard</button>
+                        <button class="btn btn-warning" onclick="alert('✅ JavaScript Working! Time: ' + new Date().toLocaleTimeString());">⚠️ JS Test</button>
+                        <button class="btn btn-success" onclick="alert('✅ Basic Inline Test Successful! ' + new Date().toLocaleTimeString());">✅ Basic Test</button>
+                    </div>
+                </div>
+            </div>
+            <div class="features-section">
+                <h2>How Skill Swap Works</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i data-lucide="book-open"></i>
+                        </div>
+                        <h3>Share Your Skills</h3>
+                        <p>Create listings for skills you can teach. From programming to cooking, share what you're passionate about.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i data-lucide="users"></i>
+                        </div>
+                        <h3>Connect & Swap</h3>
+                        <p>Find people who want to learn your skills and can teach you something new. It's all about fair exchange!</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i data-lucide="star"></i>
+                        </div>
+                        <h3>Earn & Learn</h3>
+                        <p>Build your reputation through reviews. Verified users with 3.5+ stars can also monetize their skills.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer" class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Skill Swap</h4>
+                <p>Share your skills, learn from others, and grow together.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Platform</h4>
+                <ul>
+                    <li><a href="/">Browse Skills</a></li>
+                    <li><a href="/how-it-works">How it Works</a></li>
+                    <li><a href="/pricing">Pricing</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="/help">Help Center</a></li>
+                    <li><a href="/contact">Contact Us</a></li>
+                    <li><a href="/safety">Safety</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="/terms">Terms of Service</a></li>
+                    <li><a href="/privacy">Privacy Policy</a></li>
+                    <li><a href="/cookies">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Skill Swap. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modal Container -->
+    <div id="modal-container" class="modal-container"></div>
+
+    <!-- Login Modal Template -->
+    <template id="login-modal-template">
+        <div class="modal-backdrop" onclick="closeModal()">
+            <div class="modal" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h2>Sign In to Skill Swap</h2>
+                    <button class="btn-close" onclick="closeModal()">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Google Sign In -->
+                    <div class="google-signin-container">
+                        <div id="g_id_onload"
+                             data-client_id="YOUR_GOOGLE_CLIENT_ID"
+                             data-callback="handleGoogleLogin"
+                             data-auto_prompt="false">
+                        </div>
+                        <div class="g_id_signin"
+                             data-type="standard"
+                             data-size="large"
+                             data-theme="outline"
+                             data-text="sign_in_with"
+                             data-shape="rectangular"
+                             data-logo_alignment="left">
+                        </div>
+                        
+                        <div class="divider">
+                            <span>or</span>
+                        </div>
+                    </div>
+                    
+                    <form id="login-form" onsubmit="handleLogin(event)">
+                        <div class="form-group">
+                            <label for="login-email">Email Address</label>
+                            <input type="email" id="login-email" name="email" required 
+                                   placeholder="Enter your email">
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" name="password" required 
+                                   placeholder="Enter your password">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-full">
+                                Sign In
+                            </button>
+                        </div>
+                    </form>
+                    <div class="modal-footer">
+                        <p>Don't have an account? 
+                            <button class="btn-link" onclick="showRegisterModal()">Sign up here</button>
+                        </p>
+                        <button class="btn-link" onclick="showForgotPasswordModal()">
+                            Forgot your password?
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Register Modal Template -->
+    <template id="register-modal-template">
+        <div class="modal-backdrop" onclick="closeModal()">
+            <div class="modal" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h2>Join Skill Swap</h2>
+                    <button class="btn-close" onclick="closeModal()">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Google Sign Up -->
+                    <div class="google-signin-container">
+                        <div id="g_id_onload_register"
+                             data-client_id="YOUR_GOOGLE_CLIENT_ID"
+                             data-callback="handleGoogleRegister"
+                             data-auto_prompt="false">
+                        </div>
+                        <div class="g_id_signin"
+                             data-type="standard"
+                             data-size="large"
+                             data-theme="outline"
+                             data-text="signup_with"
+                             data-shape="rectangular"
+                             data-logo_alignment="left">
+                        </div>
+                        
+                        <div class="divider">
+                            <span>or</span>
+                        </div>
+                    </div>
+                    
+                    <form id="register-form" onsubmit="handleRegister(event)">
+                        <div class="form-group">
+                            <label for="register-name">Full Name</label>
+                            <input type="text" id="register-name" name="name" required 
+                                   placeholder="Enter your full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-email">Email Address</label>
+                            <input type="email" id="register-email" name="email" required 
+                                   placeholder="Enter your email address">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password">Password</label>
+                            <input type="password" id="register-password" name="password" required 
+                                   placeholder="Create a strong password" minlength="8">
+                            <small class="form-hint">Must be at least 8 characters with uppercase, lowercase, number, and special character</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="terms-checkbox" required>
+                                <span class="checkmark"></span>
+                                I agree to the <a href="/terms" target="_blank">Terms of Service</a> 
+                                and <a href="/privacy" target="_blank">Privacy Policy</a>
+                            </label>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-full">
+                                Create Account
+                            </button>
+                        </div>
+                    </form>
+                    <div class="modal-footer">
+                        <p>Already have an account? 
+                            <button class="btn-link" onclick="showLoginModal()">Sign in here</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- JavaScript - Consolidated Essential Functions -->
+    <script>
+        console.log('🎯 Starting comprehensive debugging system...');
+        
+        // Enhanced error handling with CSS loading detection
+        window.addEventListener('error', (event) => {
+            console.error('💥 JavaScript Error:', event.error);
+            const errorMsg = `Error: ${event.message} in ${event.filename} at line ${event.lineno}`;
+            console.error(errorMsg);
+            
+            // Show error visually
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = errorMsg;
+            document.body.appendChild(errorDiv);
+            
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                if (errorDiv.parentNode) {
+                    errorDiv.parentNode.removeChild(errorDiv);
+                }
+            }, 10000);
+        });
+        
+        // Check CSS loading status
+        function checkCSSLoading() {
+            const links = document.querySelectorAll('link[rel="stylesheet"]');
+            console.log('🎨 Checking CSS files:', links.length);
+            
+            links.forEach(link => {
+                link.addEventListener('load', function() {
+                    console.log('✅ CSS loaded:', this.href);
+                });
+                
+                link.addEventListener('error', function() {
+                    console.error('❌ CSS failed to load:', this.href);
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'error-message';
+                    errorDiv.textContent = `CSS Failed: ${this.href}`;
+                    document.body.appendChild(errorDiv);
+                });
+            });
+        }
+        
+        // Essential navigation functions that work immediately
+        window.essentialNav = {
+            navigate: function(path) {
+                console.log('🧭 Essential navigation to:', path);
+                window.history.pushState({}, '', path);
+                window.location.reload(); // Simple but reliable
+            },
+            
+            showModal: function(type) {
+                console.log('📝 Showing modal:', type);
+                alert(`${type} modal would open here. Basic functionality working!`);
+            }
+        };
+        
+        // Simple test functions
+        window.simpleTest = function() {
+            const time = new Date().toLocaleTimeString();
+            console.log('✅ Simple test executed at', time);
+            console.log('🔍 Current scripts loaded:', Object.keys(window.scriptsLoaded || {}));
+            console.log('🌐 Window.SkillSwap exists:', !!window.SkillSwap);
+            alert(`✅ JavaScript Working!\nTime: ${time}\nScripts: ${Object.keys(window.scriptsLoaded || {}).length}`);
+        };
+        
+        // Direct page navigation functions (bypass complex routing)
+        window.debugNavigateToBrowse = function() {
+            console.log('🔧 Direct navigation to browse page');
+            window.location.href = '/browse';
+        };
+        
+        window.debugTestRouter = function() {
+            console.log('🔧 Testing direct navigation');
+            alert('Redirecting to browse page...');
+            setTimeout(() => {
+                window.location.href = '/browse';
+            }, 1000);
+        };
+        
+        window.showLoginModal = function() {
+            console.log('🔑 Login function called');
+            alert('Login Modal: This would open the login form. Redirecting to dashboard for demo...');
+            setTimeout(() => {
+                window.location.href = '/dashboard';
+            }, 1500);
+        };
+        
+        window.showRegisterModal = function() {
+            console.log('📝 Register function called');
+            alert('Register Modal: This would open the registration form. Redirecting to dashboard for demo...');
+            setTimeout(() => {
+                window.location.href = '/dashboard';
+            }, 1500);
+        };
+        
+        // Track script loading
+        window.scriptsLoaded = { inline: true };
+        
+        function checkScriptLoad(name) {
+            window.scriptsLoaded[name] = true;
+            console.log('✅ Script loaded:', name, 'Total:', Object.keys(window.scriptsLoaded).length);
+        }
+        
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 DOM loaded, initializing...');
+            
+            // Check CSS loading
+            checkCSSLoading();
+            
+            // Hide loading spinner
+            const spinner = document.getElementById('loading-spinner');
+            if (spinner) {
+                spinner.style.display = 'none';
+                console.log('🫥 Loading spinner hidden');
+            }
+            
+            // Show appropriate content based on current URL
+            showPageContent();
+            
+            // Handle all clicks on the page
+            document.addEventListener('click', function(event) {
+                console.log('🖱️ Click detected on:', event.target.tagName, event.target.className, 'ID:', event.target.id);
+                
+                // Handle buttons with onclick first (highest priority)
+                if (event.target.tagName === 'BUTTON' && event.target.hasAttribute('onclick')) {
+                    console.log('🔘 Button with onclick clicked:', event.target.getAttribute('onclick'));
+                    // Let the onclick handler execute normally
+                    return;
+                }
+                
+                // Handle direct button clicks without onclick
+                if (event.target.tagName === 'BUTTON') {
+                    const buttonText = event.target.textContent.trim();
+                    console.log('🔘 Button clicked:', buttonText);
+                    
+                    // Handle specific buttons by text content
+                    if (buttonText.includes('Basic Test')) {
+                        console.log('🎯 Executing basic test');
+                        window.simpleTest();
+                        return;
+                    }
+                    if (buttonText.includes('Test Browse')) {
+                        console.log('🎯 Executing browse navigation');
+                        window.debugNavigateToBrowse();
+                        return;
+                    }
+                    if (buttonText.includes('Test Router')) {
+                        console.log('🎯 Executing router test');
+                        window.debugTestRouter();
+                        return;
+                    }
+                    if (buttonText.includes('JS Test')) {
+                        console.log('🎯 Executing JS test');
+                        window.simpleTest();
+                        return;
+                    }
+                    if (buttonText.includes('Get Started') || buttonText.includes('Sign Up')) {
+                        console.log('🎯 Executing registration');
+                        window.showRegisterModal();
+                        return;
+                    }
+                    if (buttonText.includes('Sign In')) {
+                        console.log('🎯 Executing login');
+                        window.showLoginModal();
+                        return;
+                    }
+                }
+                
+                // Handle navigation links
+                const navLink = event.target.closest('a[href]');
+                if (navLink && navLink.getAttribute('href') && navLink.getAttribute('href').startsWith('/')) {
+                    console.log('🔗 Navigation link clicked:', navLink.getAttribute('href'));
+                    event.preventDefault();
+                    window.location.href = navLink.getAttribute('href');
+                    return;
+                }
+                
+                console.log('👆 Regular click processed - no specific handler');
+            }, true); // Use capture phase to get events before they bubble
+            
+            console.log('✅ Click handlers installed');
+            
+            // Add direct event handlers to debug buttons as backup
+            setTimeout(() => {
+                const buttons = {
+                    'Basic Test': window.simpleTest,
+                    'Test Browse': window.debugNavigateToBrowse,
+                    'Test Router': window.debugTestRouter,
+                    'JS Test': window.simpleTest,
+                    'Get Started': window.showRegisterModal,
+                    'Sign In': window.showLoginModal
+                };
+                
+                document.querySelectorAll('button').forEach(button => {
+                    const text = button.textContent.trim();
+                    for (const [key, handler] of Object.entries(buttons)) {
+                        if (text.includes(key)) {
+                            console.log('🔗 Adding direct handler to:', text);
+                            button.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                console.log('🎯 Direct handler triggered for:', text);
+                                handler();
+                            });
+                            break;
+                        }
+                    }
+                });
+                
+                console.log('🔗 Direct button handlers added');
+            }, 100);
+            
+            console.log('🎉 Essential functions ready!');
+        });
+        
+        // Show page content based on URL
+        function showPageContent() {
+            const path = window.location.pathname;
+            const contentDiv = document.getElementById('page-content');
+            
+            if (!contentDiv) return;
+            
+            console.log('📄 Loading content for path:', path);
+            
+            switch (path) {
+                case '/':
+                case '/home':
+                    // Keep existing homepage content
+                    console.log('🏠 Homepage - keeping existing content');
+                    break;
+                    
+                case '/browse':
+                    contentDiv.innerHTML = `
+                        <div style="padding: 40px; text-align: center;">
+                            <h1>🔍 Browse Skills</h1>
+                            <p>This is the Browse Skills page. Here users can search and discover skills offered by others.</p>
+                            <div style="margin: 20px 0;">
+                                <button class="btn btn-primary" onclick="window.location.href='/'">← Back to Home</button>
+                                <button class="btn btn-secondary" onclick="window.location.href='/dashboard'">Go to Dashboard</button>
+                            </div>
+                            <div style="background: #f0f0f0; padding: 20px; margin: 20px 0; border-radius: 8px;">
+                                <p><strong>✅ Navigation Working!</strong> You successfully navigated to the Browse page.</p>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case '/dashboard':
+                    contentDiv.innerHTML = `
+                        <div style="padding: 40px; text-align: center;">
+                            <h1>📋 Dashboard</h1>
+                            <p>Welcome to your dashboard! Here you can manage your skills, bookings, and profile.</p>
+                            <div style="margin: 20px 0;">
+                                <button class="btn btn-primary" onclick="window.location.href='/browse'">Browse Skills</button>
+                                <button class="btn btn-secondary" onclick="window.location.href='/'">← Back to Home</button>
+                            </div>
+                            <div style="background: #e8f5e8; padding: 20px; margin: 20px 0; border-radius: 8px;">
+                                <p><strong>🎉 Success!</strong> Dashboard loaded successfully. All navigation is working properly!</p>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                default:
+                    contentDiv.innerHTML = `
+                        <div style="padding: 40px; text-align: center;">
+                            <h1>📋 Page: ${path}</h1>
+                            <p>This page (${path}) is under construction but navigation is working!</p>
+                            <div style="margin: 20px 0;">
+                                <button class="btn btn-primary" onclick="window.location.href='/'">← Back to Home</button>
+                                <button class="btn btn-secondary" onclick="window.location.href='/browse'">Browse Skills</button>
+                            </div>
+                        </div>
+                    `;
+            }
+        }
+        
+        console.log('📋 Inline script setup complete');
+    </script>
+    
+    <script src="/js/components/ApiClient.js" onload="checkScriptLoad('ApiClient')" onerror="console.warn('ApiClient.js failed to load - using fallback')"></script>
+    <script src="/js/components/NotificationManager.js" onload="checkScriptLoad('NotificationManager')" onerror="console.warn('NotificationManager.js failed to load - using fallback')"></script>
+    <script src="/js/components/SocketManager.js" onload="checkScriptLoad('SocketManager')" onerror="console.warn('SocketManager.js failed to load - using fallback')"></script>
+    <script src="/js/components/UIManager.js" onload="checkScriptLoad('UIManager')" onerror="console.warn('UIManager.js failed to load - using fallback')"></script>
+    <script src="/js/components/Router.js" onload="checkScriptLoad('Router')" onerror="console.warn('Router.js failed to load - using fallback')"></script>
+    <script src="/js/auth.js" onload="checkScriptLoad('AuthManager')" onerror="console.warn('auth.js failed to load - using fallback')"></script>
+    <script src="/js/messaging.js" onload="checkScriptLoad('MessagingComponent')" onerror="console.warn('messaging.js failed to load - using fallback')"></script>
+    <script src="/js/app.js" onload="checkScriptLoad('App')" onerror="console.warn('app.js failed to load - using fallback')"></script>
+</body>
+</html>

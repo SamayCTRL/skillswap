@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
+const { OAuth2Client } = require('google-auth-library');
 
 const config = require('../config/config');
 const db = require('../config/database');
@@ -11,6 +12,9 @@ const { validateRegistration, validateLogin } = require('../middleware/validatio
 const emailService = require('../utils/email');
 
 const router = express.Router();
+
+// Initialize Google OAuth client
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Helper function to generate JWT tokens
 const generateTokens = (userId) => {
@@ -410,6 +414,180 @@ router.post('/change-password', authMiddleware, async (req, res) => {
         res.status(500).json({
             error: 'Failed to change password',
             code: 'CHANGE_PASSWORD_ERROR'
+        });
+    }
+});
+
+// Google OAuth login
+router.post('/google-login', async (req, res) => {
+    try {
+        const { credential } = req.body;
+
+        if (!credential) {
+            return res.status(400).json({
+                error: 'Google credential is required',
+                code: 'CREDENTIAL_REQUIRED'
+            });
+        }
+
+        // Verify Google token
+        const ticket = await googleClient.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID
+        });
+
+        const payload = ticket.getPayload();
+        const { email, name, picture, sub: googleId } = payload;
+
+        // Check if user exists
+        let user = await db.getUserByEmail(email.toLowerCase());
+
+        if (user) {
+            // Update Google ID if not set
+            if (!user.google_id) {
+                await db.query(
+                    'UPDATE users SET google_id = $1, avatar_url = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3',
+                    [googleId, picture, user.id]
+                );
+                user.google_id = googleId;
+                user.avatar_url = picture;
+            }
+        } else {
+            return res.status(404).json({
+                error: 'No account found with this email. Please register first.',
+                code: 'ACCOUNT_NOT_FOUND'
+            });
+        }
+
+        // Generate tokens
+        const { accessToken, refreshToken } = generateTokens(user.id);
+
+        res.json({
+            message: 'Google login successful',
+            user: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                subscriptionTier: user.subscription_tier,
+                verified: user.verified,
+                avatar_url: user.avatar_url || picture,
+                bio: user.bio
+            },
+            tokens: {
+                accessToken,
+                refreshToken,
+                expiresIn: config.jwt.expiresIn
+            }
+        });
+
+    } catch (error) {
+        console.error('Google login error:', error);
+        res.status(400).json({
+            error: 'Invalid Google credential',
+            code: 'INVALID_GOOGLE_CREDENTIAL'
+        });
+    }
+});
+
+// Google OAuth registration
+router.post('/google-register', async (req, res) => {
+    try {
+        const { credential } = req.body;
+
+        if (!credential) {
+            return res.status(400).json({
+                error: 'Google credential is required',
+                code: 'CREDENTIAL_REQUIRED'
+            });
+        }
+
+        // Verify Google token
+        const ticket = await googleClient.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID
+        });
+
+        const payload = ticket.getPayload();
+        const { email, name, picture, sub: googleId } = payload;
+
+        // Check if user already exists
+        const existingUser = await db.getUserByEmail(email.toLowerCase());
+        if (existingUser) {
+            return res.status(409).json({
+                error: 'User already exists with this email address',
+                code: 'USER_EXISTS'
+            });
+        }
+
+        // Create user
+        const userId = uuidv4();
+        const createUserQuery = `
+            INSERT INTO users (id, email, name, google_id, avatar_url, subscription_tier, verified)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            RETURNING id, email, name, subscription_tier, verified, created_at
+        `;
+
+        const result = await db.query(createUserQuery, [
+            userId,
+            email.toLowerCase(),
+            name,
+            googleId,
+            picture,
+            'free',
+            false
+        ]);
+
+        const user = result.rows[0];
+
+        // Generate tokens
+        const { accessToken, refreshToken } = generateTokens(user.id);
+
+        // Create welcome notification
+        const welcomeNotificationQuery = `
+            INSERT INTO notifications (user_id, type, title, content)
+            VALUES ($1, $2, $3, $4)
+        `;
+
+        await db.query(welcomeNotificationQuery, [
+            user.id,
+            'system',
+            'Welcome to Skill Swap!',
+            'Welcome to Skill Swap! Start by exploring skills or sharing your own expertise with our community.'
+        ]);
+
+        // Send welcome email (async)
+        emailService.sendWelcomeEmail(email, name)
+            .catch(error => console.error('Failed to send welcome email:', error));
+
+        res.status(201).json({
+            message: 'Google registration successful',
+            user: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                subscriptionTier: user.subscription_tier,
+                verified: user.verified,
+                avatar_url: picture,
+                createdAt: user.created_at
+            },
+            tokens: {
+                accessToken,
+                refreshToken,
+                expiresIn: config.jwt.expiresIn
+            }
+        });
+
+    } catch (error) {
+        console.error('Google registration error:', error);
+        if (error.message && error.message.includes('Invalid')){
+            return res.status(400).json({
+                error: 'Invalid Google credential',
+                code: 'INVALID_GOOGLE_CREDENTIAL'
+            });
+        }
+        res.status(500).json({
+            error: 'Failed to register with Google',
+            code: 'GOOGLE_REGISTRATION_ERROR'
         });
     }
 });

@@ -109,6 +109,15 @@
         grid-template-columns: 1fr;
         gap: var(--space-4);
     }
+    
+    .stat-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+    }
 
     /* User avatar in mobile menu */
     .mobile-nav .user-info {
@@ -186,6 +195,20 @@
         display: grid;
         grid-template-columns: 1fr 300px;
         gap: var(--space-6);
+    }
+    
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-4);
+    }
+    
+    .quick-actions {
+        align-self: stretch;
+    }
+    
+    .stat-cards {
+        grid-template-columns: repeat(2, 1fr);
     }
 
     /* Sidebar */

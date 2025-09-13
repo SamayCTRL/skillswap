@@ -1,5 +1,38 @@
 // Skill Swap - Main Application
 
+// Add immediate error handling
+window.addEventListener('error', (event) => {
+    console.error('💥 Global JavaScript Error:', {
+        message: event.message,
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno,
+        error: event.error
+    });
+});
+
+console.log('🎆 App.js loading...');
+
+// Verify required classes are available
+const checkDependencies = () => {
+    const required = ['ApiClient', 'AuthManager', 'Router', 'UIManager', 'NotificationManager'];
+    const missing = [];
+    
+    required.forEach(className => {
+        if (typeof window[className] === 'undefined') {
+            missing.push(className);
+        }
+    });
+    
+    if (missing.length > 0) {
+        console.error('❌ Missing required classes:', missing);
+        return false;
+    }
+    
+    console.log('✅ All required classes available');
+    return true;
+};
+
 // Global application state and managers
 window.SkillSwap = {
     // Core managers
@@ -134,24 +167,42 @@ const initializeIcons = () => {
 // Initialize application
 const initializeApp = async () => {
     try {
-        // Show loading spinner
+        console.log('🚀 Starting Skill Swap application initialization...');
+        
+        // Check dependencies first
+        if (!checkDependencies()) {
+            throw new Error('Required JavaScript classes are not loaded. Please check the script loading order.');
+        }
+        
+        // Initialize UI manager first
         SkillSwap.ui = new UIManager();
-        SkillSwap.ui.showLoading();
+        console.log('✅ UIManager initialized');
         
         // Initialize core managers
         SkillSwap.api = new ApiClient(SkillSwap.config.apiUrl);
+        console.log('✅ ApiClient initialized');
+        
         SkillSwap.auth = new AuthManager(SkillSwap.api);
+        console.log('✅ AuthManager initialized');
+        
         SkillSwap.router = new Router();
+        console.log('✅ Router initialized');
+        
         SkillSwap.notifications = new NotificationManager();
+        console.log('✅ NotificationManager initialized');
+        
+        console.log('✅ Core managers initialized');
         
         // Initialize icons
         initializeIcons();
         
         // Check authentication status
         const isAuthenticated = await SkillSwap.auth.checkAuth();
+        console.log('🔐 Authentication status:', isAuthenticated);
         
         if (isAuthenticated) {
             SkillSwap.user = SkillSwap.auth.getCurrentUser();
+            console.log('👤 User authenticated:', SkillSwap.user?.name);
             
             // Initialize socket connection for authenticated users
             SkillSwap.socket = new SocketManager(SkillSwap.config.socketUrl, SkillSwap.auth.getToken());
@@ -171,25 +222,50 @@ const initializeApp = async () => {
             // Load notifications
             loadNotifications();
         } else {
+            console.log('🔓 User not authenticated');
             // Update UI for unauthenticated user
             updateUIForUnauthenticatedUser();
         }
         
         // Initialize router and load current page
+        console.log('🛣️ Initializing router...');
         await SkillSwap.router.init();
         
         // Set up global event listeners
+        console.log('🎯 Setting up event listeners...');
         setupEventListeners();
         
         // Hide loading spinner
         SkillSwap.ui.hideLoading();
         
+        // Test router functionality
+        console.log('🧪 Testing router availability...');
+        if (SkillSwap.router && typeof SkillSwap.router.navigate === 'function') {
+            console.log('✅ Router is available and functional');
+        } else {
+            console.error('❌ Router is not available or not functional');
+        }
+        
         console.log('✅ Skill Swap application initialized successfully');
         
     } catch (error) {
         console.error('❌ Failed to initialize application:', error);
-        SkillSwap.ui.hideLoading();
-        SkillSwap.notifications.show('Failed to initialize application. Please refresh the page.', 'error');
+        // Always hide loading spinner, even on error
+        if (SkillSwap.ui) {
+            SkillSwap.ui.hideLoading();
+        } else {
+            // Fallback if UI manager isn't initialized
+            const loadingSpinner = document.getElementById('loading-spinner');
+            if (loadingSpinner) {
+                loadingSpinner.style.display = 'none';
+            }
+        }
+        
+        if (SkillSwap.notifications) {
+            SkillSwap.notifications.show('Failed to initialize application. Please refresh the page.', 'error');
+        } else {
+            alert('Failed to initialize application. Please refresh the page.');
+        }
     }
 };
 
@@ -322,11 +398,86 @@ const setupEventListeners = () => {
     
     // Handle navigation clicks
     document.addEventListener('click', (event) => {
+        // Handle navigation links
         const navLink = event.target.closest('.nav-link, .mobile-nav-link');
-        if (navLink && navLink.dataset.page) {
+        if (navLink && navLink.getAttribute('href')) {
+            console.log('🔗 Navigation link clicked:', navLink.getAttribute('href'));
             event.preventDefault();
-            const page = navLink.dataset.page;
-            SkillSwap.router.navigate(`/${page === 'home' ? '' : page}`);
+            const href = navLink.getAttribute('href');
+            if (SkillSwap.router) {
+                SkillSwap.router.navigate(href);
+            } else {
+                console.error('❌ Router not available');
+            }
+            
+            // Close mobile menu if open
+            const mobileNav = document.getElementById('mobile-nav');
+            if (mobileNav && !mobileNav.classList.contains('hidden')) {
+                mobileNav.classList.add('hidden');
+            }
+            return;
+        }
+        
+        // Handle dropdown menu links
+        const dropdownLink = event.target.closest('.dropdown-item');
+        if (dropdownLink && dropdownLink.getAttribute('href')) {
+            console.log('🔽 Dropdown link clicked:', dropdownLink.getAttribute('href'));
+            event.preventDefault();
+            const href = dropdownLink.getAttribute('href');
+            if (SkillSwap.router) {
+                SkillSwap.router.navigate(href);
+            } else {
+                console.error('❌ Router not available');
+            }
+            
+            // Close dropdowns
+            document.querySelectorAll('.dropdown-menu').forEach(dropdown => {
+                dropdown.classList.add('hidden');
+            });
+            return;
+        }
+        
+        // Handle regular links with href attributes
+        const regularLink = event.target.closest('a[href]');
+        if (regularLink && regularLink.getAttribute('href').startsWith('/')) {
+            console.log('🔗 Regular link clicked:', regularLink.getAttribute('href'));
+            event.preventDefault();
+            const href = regularLink.getAttribute('href');
+            if (SkillSwap.router) {
+                SkillSwap.router.navigate(href);
+            } else {
+                console.error('❌ Router not available');
+            }
+            return;
+        }
+        
+        // Handle buttons with data-navigate attribute
+        const navButton = event.target.closest('[data-navigate]');
+        if (navButton) {
+            console.log('🔘 Navigation button clicked:', navButton.getAttribute('data-navigate'));
+            event.preventDefault();
+            const path = navButton.getAttribute('data-navigate');
+            if (SkillSwap.router) {
+                SkillSwap.router.navigate(path);
+            } else {
+                console.error('❌ Router not available');
+            }
+            return;
+        }
+        
+        // Handle footer links
+        const footerLink = event.target.closest('footer a[href]');
+        if (footerLink) {
+            const href = footerLink.getAttribute('href');
+            if (href.startsWith('/')) {
+                console.log('📝 Footer link clicked:', href);
+                event.preventDefault();
+                if (SkillSwap.router) {
+                    SkillSwap.router.navigate(href);
+                } else {
+                    console.error('❌ Router not available');
+                }
+            }
         }
     });
     
@@ -334,7 +485,9 @@ const setupEventListeners = () => {
     document.addEventListener('click', (event) => {
         if (event.target.closest('.logo')) {
             event.preventDefault();
-            SkillSwap.router.navigate('/');
+            if (SkillSwap.router) {
+                SkillSwap.router.navigate('/');
+            }
         }
     });
     
@@ -466,6 +619,173 @@ window.logout = async () => {
     }
 };
 
+window.navigateToSkill = (skillId) => {
+    if (SkillSwap.router) {
+        SkillSwap.router.navigate(`/skills/${skillId}`);
+    }
+};
+
+// Global navigation functions
+window.navigateTo = (path) => {
+    if (SkillSwap.router) {
+        SkillSwap.router.navigate(path);
+    }
+};
+
+window.searchSkills = () => {
+    const searchInput = document.getElementById('skill-search');
+    if (searchInput && searchInput.value.trim()) {
+        if (SkillSwap.router) {
+            SkillSwap.router.navigate(`/search?q=${encodeURIComponent(searchInput.value.trim())}`);
+        }
+    }
+};
+
+window.upgradeSubscription = (tier) => {
+    // TODO: Implement subscription upgrade
+    if (SkillSwap.notifications) {
+        SkillSwap.notifications.show(`Upgrading to ${tier} plan...`, 'info');
+    }
+};
+
+window.deleteAccount = () => {
+    if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+        // TODO: Implement account deletion
+        if (SkillSwap.notifications) {
+            SkillSwap.notifications.show('Account deletion functionality coming soon', 'info');
+        }
+    }
+};
+
+window.startNewConversation = () => {
+    // TODO: Implement start new conversation
+    if (SkillSwap.notifications) {
+        SkillSwap.notifications.show('New conversation functionality coming soon', 'info');
+    }
+};
+
+// Debug functions
+window.debugNavigateToBrowse = () => {
+    console.log('🔧 Debug: Testing navigation to /browse');
+    console.log('SkillSwap object:', SkillSwap);
+    console.log('Router available:', !!SkillSwap.router);
+    console.log('Navigate function:', typeof SkillSwap.router?.navigate);
+    
+    if (SkillSwap.router && typeof SkillSwap.router.navigate === 'function') {
+        console.log('✅ Router is available, navigating...');
+        SkillSwap.router.navigate('/browse');
+    } else {
+        console.error('❌ Router is not available!');
+        alert('Router is not available! Check console for details.');
+    }
+};
+
+window.debugTestRouter = () => {
+    console.log('🔧 Debug: Router diagnostics');
+    console.log('Current URL:', window.location.href);
+    console.log('SkillSwap global:', window.SkillSwap);
+    console.log('Router instance:', window.SkillSwap?.router);
+    console.log('Router methods:', Object.getOwnPropertyNames(window.SkillSwap?.router || {}));
+    
+    if (window.SkillSwap?.router?.routes) {
+        console.log('Available routes:', Array.from(window.SkillSwap.router.routes.keys()));
+    }
+    
+    alert('Check console for router diagnostics!');
+};
+
+// Simple test function that should always work
+window.simpleTest = () => {
+    const message = 'JavaScript is working! SkillSwap object exists: ' + (typeof window.SkillSwap !== 'undefined');
+    alert(message);
+    console.log('Simple test executed');
+    console.log('SkillSwap object:', window.SkillSwap);
+    console.log('Available classes:', {
+        ApiClient: typeof ApiClient,
+        Router: typeof Router,
+        UIManager: typeof UIManager,
+        AuthManager: typeof AuthManager,
+        NotificationManager: typeof NotificationManager
+    });
+};
+
+// Google OAuth handlers
+window.handleGoogleLogin = async (response) => {
+    try {
+        const result = await SkillSwap.auth.googleLogin(response.credential);
+        
+        if (result.success) {
+            SkillSwap.user = result.user;
+            
+            // Initialize socket connection
+            SkillSwap.socket = new SocketManager(SkillSwap.config.socketUrl, SkillSwap.auth.getToken());
+            await SkillSwap.socket.connect();
+            
+            // Initialize messaging component
+            if (typeof MessagingComponent !== 'undefined') {
+                SkillSwap.messaging = new MessagingComponent();
+            }
+            
+            // Update UI
+            updateUIForAuthenticatedUser();
+            
+            // Load user data
+            loadUnreadMessageCount();
+            loadNotifications();
+            
+            // Close modal and show success
+            closeModal();
+            SkillSwap.notifications.show('Welcome back!', 'success');
+            
+            // Navigate to dashboard
+            SkillSwap.router.navigate('/dashboard');
+        } else {
+            SkillSwap.notifications.show(result.error || 'Google login failed', 'error');
+        }
+    } catch (error) {
+        console.error('Google login error:', error);
+        SkillSwap.notifications.show('Google login failed. Please try again.', 'error');
+    }
+};
+
+window.handleGoogleRegister = async (response) => {
+    try {
+        const result = await SkillSwap.auth.googleRegister(response.credential);
+        
+        if (result.success) {
+            SkillSwap.user = result.user;
+            
+            // Initialize socket connection
+            SkillSwap.socket = new SocketManager(SkillSwap.config.socketUrl, SkillSwap.auth.getToken());
+            await SkillSwap.socket.connect();
+            
+            // Initialize messaging component
+            if (typeof MessagingComponent !== 'undefined') {
+                SkillSwap.messaging = new MessagingComponent();
+            }
+            
+            // Update UI
+            updateUIForAuthenticatedUser();
+            
+            // Load user data
+            loadUnreadMessageCount();
+            loadNotifications();
+            
+            // Close modal and show success
+            closeModal();
+            SkillSwap.notifications.show('Welcome to Skill Swap!', 'success');
+            
+            // Navigate to dashboard
+            SkillSwap.router.navigate('/dashboard');
+        } else {
+            SkillSwap.notifications.show(result.error || 'Google registration failed', 'error');
+        }
+    } catch (error) {
+        console.error('Google registration error:', error);
+        SkillSwap.notifications.show('Google registration failed. Please try again.', 'error');
+    }
+};
+
 window.handleLogin = async (event) => {
     event.preventDefault();
     
@@ -591,10 +911,34 @@ window.handleRegister = async (event) => {
 };
 
 // Initialize the application when DOM is ready
+console.log('🔍 Script loaded, DOM state:', document.readyState);
+
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeApp);
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('📋 DOMContentLoaded event fired');
+        // Hide loading spinner immediately
+        const loadingSpinner = document.getElementById('loading-spinner');
+        if (loadingSpinner) {
+            loadingSpinner.style.display = 'none';
+        }
+        
+        // Initialize app
+        initializeApp().catch(error => {
+            console.error('💥 Initialization failed:', error);
+        });
+    });
 } else {
-    initializeApp();
+    console.log('📋 DOM already ready, initializing immediately');
+    // Hide loading spinner immediately
+    const loadingSpinner = document.getElementById('loading-spinner');
+    if (loadingSpinner) {
+        loadingSpinner.style.display = 'none';
+    }
+    
+    // Initialize app
+    initializeApp().catch(error => {
+        console.error('💥 Initialization failed:', error);
+    });
 }
 
 // Handle page unload
