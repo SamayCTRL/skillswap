@@ -9,7 +9,15 @@
     "setup": "node setup.js",
     "seed": "node server/utils/seedData.js",
     "seed:clear": "node server/utils/seedData.js clear",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:unit": "jest tests/unit",
+    "test:integration": "jest tests/integration",
+    "test:e2e": "playwright test",
+    "test:all": "npm run test:unit && npm run test:integration && npm run test:e2e",
+    "lint": "echo 'Linting would be configured here with ESLint'",
+    "format": "echo 'Formatting would be configured here with Prettier'"
   },
   "keywords": [
     "skill-sharing",
@@ -44,7 +52,14 @@
     "xss": "^1.0.15"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "@playwright/test": "^1.55.0",
+    "@types/jest": "^30.0.0",
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.1.3",
+    "jsdom": "^27.0.0",
+    "nodemon": "^3.0.1",
+    "playwright": "^1.55.0",
+    "supertest": "^7.1.4"
   },
   "engines": {
     "node": ">=16.0.0"
