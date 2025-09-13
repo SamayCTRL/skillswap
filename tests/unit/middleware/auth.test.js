@@ -61,7 +61,9 @@ describe('Auth Middleware', () => {
     it('should return 401 when token is invalid', async () => {
       req.header.mockReturnValue('Bearer invalid-token');
       jwt.verify.mockImplementation(() => {
-        throw new Error('Invalid token');
+        const error = new Error('Invalid token');
+        error.name = 'JsonWebTokenError';
+        throw error;
       });
 
       await authMiddleware(req, res, next);
@@ -135,7 +137,8 @@ describe('Auth Middleware', () => {
     });
 
     it('should deny action when over usage limit', async () => {
-      req.user = testHelper.createMockUser();
+      const mockUser = { ...testHelper.createMockUser(), subscriptionTier: 'free' };
+      req.user = mockUser;
       db.checkUsageLimit.mockResolvedValue(false);
       db.getUsageCount.mockResolvedValue(5);
 
