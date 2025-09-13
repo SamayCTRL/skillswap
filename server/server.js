@@ -5,6 +5,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss');
 const path = require('path');
 require('dotenv').config();
 
@@ -24,7 +26,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
     cors: {
-        origin: process.env.CLIENT_URL || "*",
+        origin: process.env.CLIENT_URL || "http://localhost:3000",
         methods: ["GET", "POST"],
         credentials: true
     }
@@ -47,7 +49,7 @@ app.use(helmet({
 
 // CORS configuration
 const corsOptions = {
-    origin: process.env.CLIENT_URL || true,
+    origin: process.env.CLIENT_URL || 'http://localhost:3000',
     credentials: true,
     optionsSuccessStatus: 200
 };
@@ -79,6 +81,40 @@ const authLimiter = rateLimit({
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Data sanitization
+app.use(mongoSanitize()); // Remove NoSQL injection attempts
+app.use((req, res, next) => {
+    // XSS protection for request body, query, and params
+    if (req.body) {
+        req.body = sanitizeObject(req.body);
+    }
+    if (req.query) {
+        req.query = sanitizeObject(req.query);
+    }
+    if (req.params) {
+        req.params = sanitizeObject(req.params);
+    }
+    next();
+});
+
+// XSS sanitization helper function
+function sanitizeObject(obj) {
+    if (typeof obj === 'string') {
+        return xss(obj);
+    } else if (Array.isArray(obj)) {
+        return obj.map(item => sanitizeObject(item));
+    } else if (obj !== null && typeof obj === 'object') {
+        const sanitized = {};
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                sanitized[key] = sanitizeObject(obj[key]);
+            }
+        }
+        return sanitized;
+    }
+    return obj;
+}
 
 // Logging middleware
 app.use(morgan('combined'));

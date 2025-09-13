@@ -22,6 +22,9 @@ CREATE TYPE notification_type AS ENUM ('message', 'booking', 'review', 'subscrip
 -- Difficulty level enum
 CREATE TYPE difficulty_level AS ENUM ('beginner', 'intermediate', 'advanced', 'expert');
 
+-- User role enum
+CREATE TYPE user_role AS ENUM ('user', 'admin', 'moderator');
+
 -- Users table with subscription tracking
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -31,6 +34,7 @@ CREATE TABLE users (
     bio TEXT,
     avatar_url VARCHAR(500),
     subscription_tier subscription_tier DEFAULT 'free',
+    role user_role DEFAULT 'user',
     verified BOOLEAN DEFAULT FALSE,
     credits INTEGER DEFAULT 0,
     location VARCHAR(100),

@@ -61,9 +61,7 @@
                 <a href="#" onclick="showPage('messages')" class="nav-link">Messages</a>
             </div>
             <div id="auth-buttons">
-                <button class="btn btn-secondary" onclick="showPage('login')">Sign In</button>
-                <button class="btn btn-primary" onclick="showPage('register')">Get Started</button>
-                <button class="btn btn-success" onclick="showPage('upgrade')">Upgrade to Pro</button>
+                <!-- Buttons will be dynamically updated based on auth state -->
             </div>
         </nav>
     </header>
@@ -220,6 +218,7 @@
                 authButtons.innerHTML = `
                     <span style="margin-right: 15px; color: #374151;">Welcome, ${user.name} ${isPro ? '⭐' : ''}</span>
                     <button class="btn btn-secondary" onclick="showPage('dashboard')">Dashboard</button>
+                    ${!isPro ? '<button class="btn btn-success" onclick="showPage(\'upgrade\')" style="margin-right: 10px;">Upgrade to Pro</button>' : ''}
                     <button class="btn btn-primary" onclick="logout()">Logout</button>
                 `;
             } else {
@@ -229,6 +228,38 @@
                     <button class="btn btn-success" onclick="showPage('upgrade')">Upgrade to Pro</button>
                 `;
             }
+            
+            // Update navigation links visibility
+            updateNavigationVisibility(user);
+        }
+        
+        // UPDATE NAVIGATION VISIBILITY BASED ON AUTH STATE
+        function updateNavigationVisibility(user) {
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                const href = link.getAttribute('onclick');
+                
+                // Hide dashboard and messages for non-authenticated users
+                if (!user && (href.includes('dashboard') || href.includes('messages'))) {
+                    link.style.opacity = '0.5';
+                    link.style.cursor = 'not-allowed';
+                    link.onclick = function(e) {
+                        e.preventDefault();
+                        alert('🔐 Please sign in to access this feature.');
+                        showPage('login');
+                        return false;
+                    };
+                } else {
+                    link.style.opacity = '1';
+                    link.style.cursor = 'pointer';
+                    // Restore original onclick for authenticated users
+                    if (href.includes('dashboard')) {
+                        link.onclick = function(e) { e.preventDefault(); showPage('dashboard'); };
+                    } else if (href.includes('messages')) {
+                        link.onclick = function(e) { e.preventDefault(); showPage('messages'); };
+                    }
+                }
+            });
         }
         // NAVIGATION FUNCTIONS
         function showPage(pageName) {
@@ -262,6 +293,31 @@
         function getCurrentUser() {
             const userStr = localStorage.getItem('user');
             return userStr ? JSON.parse(userStr) : null;
+        }
+        
+        // BUTTON ACTION FUNCTIONS
+        function viewSkillDetails(skillId) {
+            alert(`📋 Skill Details: This will show detailed information about skill #${skillId || 'example'}. Feature coming soon!`);
+        }
+        
+        function manageSkills() {
+            alert('📚 Manage Skills: This will open your skills management page. Feature coming soon!');
+        }
+        
+        function viewCalendar() {
+            alert('📅 Calendar: This will show your booking calendar. Feature coming soon!');
+        }
+        
+        function viewEarnings() {
+            alert('💰 Earnings: This will show your earnings dashboard. Feature coming soon!');
+        }
+        
+        function viewReviews() {
+            alert('⭐ Reviews: This will show all your reviews and ratings. Feature coming soon!');
+        }
+        
+        function openConversation(userName) {
+            alert(`💬 Opening conversation with ${userName || 'user'}. Real-time messaging feature coming soon!`);
         }
         
         function showLoginModal() {
@@ -460,19 +516,19 @@
                                     <h3>🎸 Guitar Lessons</h3>
                                     <p>Learn acoustic and electric guitar from beginner to advanced levels.</p>
                                     <p><strong>$25/hour</strong></p>
-                                    <button class="btn btn-primary">View Details</button>
+                                    <button class="btn btn-primary" onclick="viewSkillDetails('guitar-lessons')">View Details</button>
                                 </div>
                                 <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                     <h3>💻 Web Development</h3>
                                     <p>Full-stack development using React, Node.js, and modern tools.</p>
                                     <p><strong>$50/hour</strong></p>
-                                    <button class="btn btn-primary">View Details</button>
+                                    <button class="btn btn-primary" onclick="viewSkillDetails('web-development')">View Details</button>
                                 </div>
                                 <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                     <h3>🎨 Digital Art</h3>
                                     <p>Learn digital illustration and design using Photoshop and Illustrator.</p>
                                     <p><strong>$30/hour</strong></p>
-                                    <button class="btn btn-primary">View Details</button>
+                                    <button class="btn btn-primary" onclick="viewSkillDetails('digital-art')">View Details</button>
                                 </div>
                             </div>
                             
@@ -511,25 +567,25 @@
                                     <h3>📚 Your Skills</h3>
                                     <p>${isPro ? 'Unlimited skills' : '3 skills max'}</p>
                                     <p style="color: #6B7280;">Currently: 2 active skills</p>
-                                    <button class="btn btn-primary">Manage Skills</button>
+                                    <button class="btn btn-primary" onclick="manageSkills()">Manage Skills</button>
                                 </div>
                                 <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                     <h3>📅 Upcoming Sessions</h3>
                                     <p>2 sessions this week</p>
                                     <p style="color: #6B7280;">Next: Tomorrow 2:00 PM</p>
-                                    <button class="btn btn-primary">View Calendar</button>
+                                    <button class="btn btn-primary" onclick="viewCalendar()">View Calendar</button>
                                 </div>
                                 <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                     <h3>💰 Earnings</h3>
                                     <p>$${isPro ? '245' : '150'} this month</p>
                                     <p style="color: #6B7280;">${isPro ? '+63% vs last month' : 'Upgrade for more earnings'}</p>
-                                    <button class="btn btn-primary">View Details</button>
+                                    <button class="btn btn-primary" onclick="viewEarnings()">View Details</button>
                                 </div>
                                 <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                     <h3>⭐ Reviews</h3>
                                     <p>4.8/5 average rating</p>
                                     <p style="color: #6B7280;">12 total reviews</p>
-                                    <button class="btn btn-primary">View Reviews</button>
+                                    <button class="btn btn-primary" onclick="viewReviews()">View Reviews</button>
                                 </div>
                             </div>
                             
@@ -567,7 +623,7 @@
                             <p>Your conversations with other users.</p>
                             
                             <div style="background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                                <div style="padding: 20px; border-bottom: 1px solid #e5e7eb;">
+                                <div style="padding: 20px; border-bottom: 1px solid #e5e7eb; cursor: pointer; transition: background-color 0.2s;" onclick="openConversation('John Smith')" onmouseover="this.style.backgroundColor='#f9fafb'" onmouseout="this.style.backgroundColor='white'">
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         <div style="width: 40px; height: 40px; border-radius: 50%; background: #3B82F6; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">JS</div>
                                         <div>
@@ -577,7 +633,7 @@
                                         <div style="margin-left: auto; color: #6B7280; font-size: 12px;">2 min ago</div>
                                     </div>
                                 </div>
-                                <div style="padding: 20px; border-bottom: 1px solid #e5e7eb;">
+                                <div style="padding: 20px; border-bottom: 1px solid #e5e7eb; cursor: pointer; transition: background-color 0.2s;" onclick="openConversation('Emily Chen')" onmouseover="this.style.backgroundColor='#f9fafb'" onmouseout="this.style.backgroundColor='white'">
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         <div style="width: 40px; height: 40px; border-radius: 50%; background: #10B981; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">EM</div>
                                         <div>
@@ -609,7 +665,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('📱 DOM loaded, initializing bulletproof navigation...');
             
-            // Update header based on auth state
+            // Update header based on auth state immediately
             updateHeader();
             
             // Load appropriate content for current page
@@ -644,6 +700,13 @@
             console.log('🎉 Bulletproof navigation system ready!');
             console.log('🧪 Type "testNavigation()" in console to test navigation');
         });
+        
+        // Also update header when page loads initially (in case DOM is already ready)
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', updateHeader);
+        } else {
+            updateHeader();
+        }
         
         console.log('📋 Script loaded successfully');
     </script>
