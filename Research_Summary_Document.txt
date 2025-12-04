@@ -1,0 +1,33 @@
+Research Summary for Skill Swap Project
+
+What I Researched: HTML tags and structure (MDN Web Docs)
+What I Learned: Learned difference between div, header, nav, main, footer tags. Each has specific semantic purpose for screen readers and SEO.
+How It Helped My Project: Helped me build proper website structure instead of just using div for everything. Made my site more professional and accessible.
+
+What I Researched: CSS responsive design (W3Schools)
+What I Learned: Discovered CSS Grid and Flexbox for making websites work on phones and computers. Mobile-first design is important since most students use phones.
+How It Helped My Project: Let me create a platform that works perfectly on mobile devices, which is essential for reaching student users.
+
+What I Researched: JavaScript basics and functions
+What I Learned: Learned how to make interactive features like user signup, login simulation, and dynamic content updates using localStorage.
+How It Helped My Project: Enabled me to create the subscription system and user account features that make the platform actually functional.
+
+What I Researched: Fiverr business model
+What I Learned: Found out they charge 20% transaction fees from sellers, plus additional fees for buyers. Very expensive for students. No free tier available.
+How It Helped My Project: Convinced me to create a freemium model instead - free basic access with paid upgrades, which is much more student-friendly.
+
+What I Researched: Airbnb pricing strategy
+What I Learned: Uses percentage-based fees (usually 14-16%) but also charges cleaning fees and service fees. Complex pricing structure with no free option.
+How It Helped My Project: Showed me why simple, transparent pricing is better. Led to my freemium model with Free/Verified ($9.99)/Pro ($19.99) tiers.
+
+What I Researched: Color psychology in branding
+What I Learned: Blue creates trust and reliability (banks use it), green represents growth and learning, red creates urgency but can seem aggressive.
+How It Helped My Project: Helped me choose blue and green for my platform colors to build trust while emphasizing the learning aspect.
+
+What I Researched: Stripe payment integration
+What I Learned: Provides secure payment processing that students already trust. Easier to implement than building custom payment system.
+How It Helped My Project: Decided to use Stripe for payment processing to ensure security and user trust for the subscription system.
+
+What I Researched: Student spending habits research
+What I Learned: Most students have very limited budgets and need free options to try platforms first. They prefer predictable costs over surprise fees when they do upgrade.
+How It Helped My Project: Confirmed that a freemium model would work best - free tier to attract users, then affordable paid upgrades for those who want more features.

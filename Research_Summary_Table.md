@@ -1,0 +1,12 @@
+# Research Summary for Skill Swap Project
+
+| What I Researched | What I Learned | How It Helped My Project |
+|-------------------|----------------|--------------------------|
+| HTML tags and structure (MDN Web Docs) | Learned difference between div, header, nav, main, footer tags. Each has specific semantic purpose for screen readers and SEO. | Helped me build proper website structure instead of just using div for everything. Made my site more professional and accessible. |
+| CSS responsive design (W3Schools) | Discovered CSS Grid and Flexbox for making websites work on phones and computers. Mobile-first design is important since most students use phones. | Let me create a platform that works perfectly on mobile devices, which is essential for reaching student users. |
+| JavaScript basics and functions | Learned how to make interactive features like user signup, login simulation, and dynamic content updates using localStorage. | Enabled me to create the subscription system and user account features that make the platform actually functional. |
+| Fiverr business model | Found out they charge 20% transaction fees from sellers, plus additional fees for buyers. Very expensive for students. | Convinced me to avoid transaction fees and use subscription pricing instead, which is more affordable for students. |
+| Airbnb pricing strategy | Uses percentage-based fees (usually 14-16%) but also charges cleaning fees and service fees. Complex pricing structure. | Showed me why simple, transparent pricing is better. Led to my clear Free/$9.99/$19.99 tier structure. |
+| Color psychology in branding | Blue creates trust and reliability (banks use it), green represents growth and learning, red creates urgency but can seem aggressive. | Helped me choose blue and green for my platform colors to build trust while emphasizing the learning aspect. |
+| Stripe payment integration | Provides secure payment processing that students already trust. Easier to implement than building custom payment system. | Decided to use Stripe for payment processing to ensure security and user trust for the subscription system. |
+| Student spending habits research | Most students budget monthly expenses carefully and prefer predictable costs over surprise fees. Limited disposable income. | Confirmed that subscription model would work better than transaction fees for my target audience. |

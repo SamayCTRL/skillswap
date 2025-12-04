@@ -1,0 +1,92 @@
+My Decision-Making Process for Skill Swap Project
+
+DECISION 1: Website Builder vs Custom Coding
+
+Website Builder (Wix/Webflow) - PROS:
+- Much faster to build (could finish in 1-2 weeks)
+- Professional templates already made
+- More time to focus on business stuff like marketing
+- Easier to make changes later
+- No need to learn complicated coding
+
+Website Builder (Wix/Webflow) - CONS:
+- Wouldn't actually learn web development 
+- Limited customization options
+- Monthly fees just for hosting
+- Wouldn't understand how websites really work
+- Defeats the purpose of my learning goal
+
+Custom Coding - PROS:
+- Actually learn HTML, CSS, JavaScript properly
+- Complete control over design and features
+- Understand exactly how everything works
+- Can customize anything I want
+- Builds real programming skills
+
+Custom Coding - CONS:
+- Takes way longer (months instead of weeks)
+- Need to learn everything from scratch
+- More likely to have bugs and problems
+- Less time for business development
+- Might look less professional at first
+
+MY DECISION: Custom Coding
+REASONING: Even though it's harder and takes longer, my main goal was to learn web development. Using a website builder would be like claiming I learned to cook when I just used a microwave. I want to actually understand how websites work, not just make something that looks good.
+
+DECISION 2: Business Model - Transaction Fees vs Freemium Subscriptions
+
+Transaction Fees (like Fiverr) - PROS:
+- Only make money when users make money
+- Scales automatically with platform usage
+- No upfront costs for users
+- Proven model that works
+
+Transaction Fees (like Fiverr) - CONS:
+- Fiverr charges 20% - too expensive for students
+- Unpredictable costs make budgeting hard
+- Students often can't afford high fees
+- Takes money away from people who need it most
+
+Freemium Subscriptions - PROS:
+- Free tier lets everyone try the platform
+- Predictable monthly costs students can budget for
+- Affordable pricing ($9.99/$19.99) designed for student budgets
+- Builds user base first, then converts to paid
+
+Freemium Subscriptions - CONS:
+- Need lots of free users to make money
+- Some people might never upgrade
+- Need to balance free vs paid features carefully
+- Less revenue per transaction
+
+MY DECISION: Freemium Subscriptions
+REASONING: Students have tight budgets and need predictable costs. A free tier removes barriers and lets everyone participate. The paid tiers ($9.99/$19.99) are affordable enough for students who want extra features. This model puts user needs first while still making the platform sustainable.
+
+DECISION 3: Quality Control - Immediate vs Rating-Based Earning
+
+Immediate Earning (like most platforms) - PROS:
+- Users can start making money right away
+- More attractive to new teachers
+- Faster platform growth
+- Less complicated system
+
+Immediate Earning - CONS:
+- No quality guarantee for students
+- Bad teachers can waste students' time and money
+- Platform reputation suffers from poor experiences
+- No incentive for teachers to do their best
+
+Rating-Based Earning (3.5+ stars required) - PROS:
+- Guarantees quality for students
+- Motivates teachers to do excellent work
+- Builds platform reputation for reliability
+- Protects students from bad experiences
+
+Rating-Based Earning - CONS:
+- New teachers can't earn money immediately
+- Might discourage some people from joining
+- More complex system to manage
+- Could slow initial growth
+
+MY DECISION: Rating-Based Earning (3.5+ stars required)
+REASONING: Quality is more important than quantity. Students need to trust that they'll get good experiences, especially when paying money. Requiring good ratings first protects students and motivates teachers to do their best work. This builds a better platform long-term even if it's slower to start.

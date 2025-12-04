@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Swap - Development Task Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 2.5em;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            margin: 10px 0 0 0;
+            font-size: 1.1em;
+        }
+        
+        .priority-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .priority-card {
+            border-radius: 10px;
+            padding: 20px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .critical {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        }
+        
+        .high {
+            background: linear-gradient(135deg, #ffa726, #ff7043);
+        }
+        
+        .medium {
+            background: linear-gradient(135deg, #42a5f5, #1e88e5);
+        }
+        
+        .low {
+            background: linear-gradient(135deg, #66bb6a, #43a047);
+        }
+        
+        .priority-card h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+        }
+        
+        .priority-icon {
+            width: 25px;
+            height: 25px;
+            margin-right: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .task-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .task-item {
+            background: rgba(255,255,255,0.1);
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .task-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(5px);
+        }
+        
+        .task-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.8);
+            border-radius: 3px;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .completed {
+            background: rgba(255,255,255,0.2);
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        
+        .progress-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            background: #e9ecef;
+            height: 25px;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 100%;
+            border-radius: 15px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        
+        .progress-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            line-height: 25px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 0;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            margin: 5px 0 0 0;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>📊 SkillSwap Task Priority System</h1>
+            <p>Organized by Priority Levels to Stay on Track</p>
+        </div>
+        
+        <div class="priority-grid">
+            <div class="priority-card critical">
+                <h3>
+                    <div class="priority-icon">🔥</div>
+                    CRITICAL Priority
+                </h3>
+                <ul class="task-list">
+                    <li class="task-item completed">
+                        <div class="task-checkbox">✓</div>
+                        Learn HTML and CSS basics
+                    </li>
+                    <li class="task-item completed">
+                        <div class="task-checkbox">✓</div>
+                        Research business models
+                    </li>
+                    <li class="task-item completed">
+                        <div class="task-checkbox">✓</div>
+                        Choose coding vs website builder
+                    </li>
+                    <li class="task-item completed">
+                        <div class="task-checkbox">✓</div>
+                        Plan project structure
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="priority-card high">
+                <h3>
+                    <div class="priority-icon">⚡</div>
+                    HIGH Priority
+                </h3>
+                <ul class="task-list">
+                    <li class="task-item completed">
+                        <div class="task-checkbox">✓</div>
+                        Build main website pages
+                    </li>
+                    <li class="task-item completed">
+                        <div class="task-checkbox">✓</div>
+                        Make it work on mobile
+                    </li>
+                    <li class="task-item completed">
+                        <div class="task-checkbox">✓</div>
+                        Add JavaScript features
+                    </li>
+                    <li class="task-item completed">
+                        <div class="task-checkbox">✓</div>
+                        Create login system
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="priority-card medium">
+                <h3>
+                    <div class="priority-icon">📋</div>
+                    MEDIUM Priority
+                </h3>
+                <ul class="task-list">
+                    <li class="task-item completed">
+                        <div class="task-checkbox">✓</div>
+                        Free/Verified/Pro pricing tiers
+                    </li>
+                    <li class="task-item completed">
+                        <div class="task-checkbox">✓</div>
+                        3.5+ star rating requirement
+                    </li>
+                    <li class="task-item">
+                        <div class="task-checkbox"></div>
+                        Payment processing setup
+                    </li>
+                    <li class="task-item">
+                        <div class="task-checkbox"></div>
+                        User messaging system
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="priority-card low">
+                <h3>
+                    <div class="priority-icon">💡</div>
+                    LOW Priority
+                </h3>
+                <ul class="task-list">
+                    <li class="task-item">
+                        <div class="task-checkbox"></div>
+                        Social sharing features
+                    </li>
+                    <li class="task-item">
+                        <div class="task-checkbox"></div>
+                        Advanced search filters
+                    </li>
+                    <li class="task-item">
+                        <div class="task-checkbox"></div>
+                        Mobile app development
+                    </li>
+                    <li class="task-item">
+                        <div class="task-checkbox"></div>
+                        Extra marketing features
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="progress-section">
+            <div class="progress-header">
+                <h2 style="margin: 0; color: #2c3e50;">📈 How Much I've Finished</h2>
+                <span style="color: #667eea; font-weight: bold; font-size: 1.2em;">75% Complete</span>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 75%;">
+                    <div class="progress-text">12 of 16 tasks done</div>
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">4/4</div>
+                    <div class="stat-label">Critical Tasks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">4/4</div>
+                    <div class="stat-label">High Priority</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">2/4</div>
+                    <div class="stat-label">Medium Priority</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">0/4</div>
+                    <div class="stat-label">Low Priority</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">6</div>
+                    <div class="stat-label">Weeks Total</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">85%</div>
+                    <div class="stat-label">On Schedule</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

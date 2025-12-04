@@ -18,11 +18,14 @@ class Router {
         this.addRoute('/profile', () => this.loadProfile());
         this.addRoute('/settings', () => this.loadSettingsPage());
         this.addRoute('/subscription', () => this.loadSubscriptionPage());
+        this.addRoute('/upgrade', () => this.loadSubscriptionPage());
         this.addRoute('/skills/:id', (params) => this.loadSkillDetail(params.id));
         this.addRoute('/users/:id', (params) => this.loadUserProfile(params.id));
         this.addRoute('/search', () => this.loadSearchPage());
         this.addRoute('/bookings', () => this.loadBookingsPage());
         this.addRoute('/help', () => this.loadHelpPage());
+        this.addRoute('/login', () => this.loadLoginPage());
+        this.addRoute('/register', () => this.loadRegisterPage());
     }
     
     // Add route
@@ -1675,6 +1678,126 @@ class Router {
                 });
             });
         });
+    }
+    
+    // Load login page
+    loadLoginPage() {
+        const content = document.getElementById('page-content');
+        if (content) {
+            content.innerHTML = `
+                <div class="container" style="padding: 40px 20px; max-width: 500px;">
+                    <h1>🔐 Sign In to Skill Swap</h1>
+                    <p>Welcome back! Sign in to your account.</p>
+                    
+                    <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
+                        <form id="loginForm">
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Email:</label>
+                                <input type="email" id="loginEmail" required style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px;">
+                            </div>
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Password:</label>
+                                <input type="password" id="loginPassword" required style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px;">
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 15px;">Sign In</button>
+                        </form>
+                        
+                        <div style="text-align: center; margin: 20px 0;">
+                            <p style="color: #6B7280;">OR</p>
+                        </div>
+                        
+                        <button class="btn btn-secondary" onclick="signInWithGoogle()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                            <span>🔍</span> Sign in with Google
+                        </button>
+                        
+                        <div style="text-align: center; margin-top: 20px;">
+                            <p>Don't have an account? <a href="#" data-navigate="/register" style="color: #3B82F6;">Sign up here</a></p>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <button class="btn btn-secondary" data-navigate="/">← Back to Home</button>
+                    </div>
+                </div>
+            `;
+            
+            // Add event listener for login form
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    if (window.handleLogin) {
+                        window.handleLogin(e);
+                    }
+                });
+            }
+        }
+        
+        if (window.SkillSwap && window.SkillSwap.utils) {
+            window.SkillSwap.utils.setPageTitle('Sign In');
+        }
+    }
+    
+    // Load register page
+    loadRegisterPage() {
+        const content = document.getElementById('page-content');
+        if (content) {
+            content.innerHTML = `
+                <div class="container" style="padding: 40px 20px; max-width: 500px;">
+                    <h1>📝 Create Your Account</h1>
+                    <p>Join Skill Swap and start sharing your skills!</p>
+                    
+                    <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
+                        <form id="registerForm">
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Full Name:</label>
+                                <input type="text" id="registerName" required style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px;">
+                            </div>
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Email:</label>
+                                <input type="email" id="registerEmail" required style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px;">
+                            </div>
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Password:</label>
+                                <input type="password" id="registerPassword" required minlength="6" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px;">
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 15px;">Create Account</button>
+                        </form>
+                        
+                        <div style="text-align: center; margin: 20px 0;">
+                            <p style="color: #6B7280;">OR</p>
+                        </div>
+                        
+                        <button class="btn btn-secondary" onclick="signUpWithGoogle()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                            <span>🔍</span> Sign up with Google
+                        </button>
+                        
+                        <div style="text-align: center; margin-top: 20px;">
+                            <p>Already have an account? <a href="#" data-navigate="/login" style="color: #3B82F6;">Sign in here</a></p>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <button class="btn btn-secondary" data-navigate="/">← Back to Home</button>
+                    </div>
+                </div>
+            `;
+            
+            // Add event listener for register form
+            const registerForm = document.getElementById('registerForm');
+            if (registerForm) {
+                registerForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    if (window.handleRegister) {
+                        window.handleRegister(e);
+                    }
+                });
+            }
+        }
+        
+        if (window.SkillSwap && window.SkillSwap.utils) {
+            window.SkillSwap.utils.setPageTitle('Create Account');
+        }
     }
     
     // Error page

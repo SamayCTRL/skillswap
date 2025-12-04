@@ -26,13 +26,13 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
     cors: {
-        origin: process.env.CLIENT_URL || "http://localhost:3000",
+        origin: process.env.CLIENT_URL || "http://localhost:8000",
         methods: ["GET", "POST"],
         credentials: true
     }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 
 // Security middleware
 app.use(helmet({
@@ -49,7 +49,7 @@ app.use(helmet({
 
 // CORS configuration
 const corsOptions = {
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    origin: process.env.CLIENT_URL || 'http://localhost:8000',
     credentials: true,
     optionsSuccessStatus: 200
 };

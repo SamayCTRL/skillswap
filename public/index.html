@@ -53,12 +53,12 @@
     <!-- Header -->
     <header>
         <nav class="navbar" id="navbar">
-            <a href="#" onclick="showPage('home')" class="logo">🔄 Skill Swap</a>
+            <a href="/" class="logo">🔄 Skill Swap</a>
             <div class="nav-links">
-                <a href="#" onclick="showPage('home')" class="nav-link">Home</a>
-                <a href="#" onclick="showPage('browse')" class="nav-link">Browse Skills</a>
-                <a href="#" onclick="showPage('dashboard')" class="nav-link">Dashboard</a>
-                <a href="#" onclick="showPage('messages')" class="nav-link">Messages</a>
+                <a href="/" class="nav-link">Home</a>
+                <a href="/browse" class="nav-link">Browse Skills</a>
+                <a href="/dashboard" class="nav-link">Dashboard</a>
+                <a href="/messages" class="nav-link">Messages</a>
             </div>
             <div id="auth-buttons">
                 <!-- Buttons will be dynamically updated based on auth state -->
@@ -74,9 +74,9 @@
                 <p>Share your skills, learn from others, and grow together in our community marketplace.</p>
                 
                 <div class="hero-actions">
-                    <button class="btn btn-primary" onclick="showPage('browse')">Browse Skills</button>
-                    <button class="btn btn-secondary" onclick="showPage('dashboard')">Dashboard</button>
-                    <button class="btn btn-success" onclick="showPage('upgrade')">Upgrade to Pro - $19.99/month</button>
+                    <button class="btn btn-primary" data-navigate="/browse">Browse Skills</button>
+                    <button class="btn btn-secondary" data-navigate="/dashboard">Dashboard</button>
+                    <button class="btn btn-success" data-navigate="/upgrade">Upgrade to Pro - $19.99/month</button>
                 </div>
             </div>
         </div>
@@ -217,15 +217,15 @@
                 const isPro = user.isPro || false;
                 authButtons.innerHTML = `
                     <span style="margin-right: 15px; color: #374151;">Welcome, ${user.name} ${isPro ? '⭐' : ''}</span>
-                    <button class="btn btn-secondary" onclick="showPage('dashboard')">Dashboard</button>
-                    ${!isPro ? '<button class="btn btn-success" onclick="showPage(\'upgrade\')" style="margin-right: 10px;">Upgrade to Pro</button>' : ''}
+                    <button class="btn btn-secondary" data-navigate="/dashboard">Dashboard</button>
+                    ${!isPro ? '<button class="btn btn-success" data-navigate="/upgrade" style="margin-right: 10px;">Upgrade to Pro</button>' : ''}
                     <button class="btn btn-primary" onclick="logout()">Logout</button>
                 `;
             } else {
                 authButtons.innerHTML = `
-                    <button class="btn btn-secondary" onclick="showPage('login')">Sign In</button>
-                    <button class="btn btn-primary" onclick="showPage('register')">Get Started</button>
-                    <button class="btn btn-success" onclick="showPage('upgrade')">Upgrade to Pro</button>
+                    <button class="btn btn-secondary" data-navigate="/login">Sign In</button>
+                    <button class="btn btn-primary" data-navigate="/register">Get Started</button>
+                    <button class="btn btn-success" data-navigate="/upgrade">Upgrade to Pro</button>
                 `;
             }
             
@@ -237,27 +237,23 @@
         function updateNavigationVisibility(user) {
             const navLinks = document.querySelectorAll('.nav-link');
             navLinks.forEach(link => {
-                const href = link.getAttribute('onclick');
+                const href = link.getAttribute('href');
                 
                 // Hide dashboard and messages for non-authenticated users
-                if (!user && (href.includes('dashboard') || href.includes('messages'))) {
+                if (!user && (href === '/dashboard' || href === '/messages')) {
                     link.style.opacity = '0.5';
                     link.style.cursor = 'not-allowed';
                     link.onclick = function(e) {
                         e.preventDefault();
                         alert('🔐 Please sign in to access this feature.');
-                        showPage('login');
+                        navigateTo('/login');
                         return false;
                     };
                 } else {
                     link.style.opacity = '1';
                     link.style.cursor = 'pointer';
-                    // Restore original onclick for authenticated users
-                    if (href.includes('dashboard')) {
-                        link.onclick = function(e) { e.preventDefault(); showPage('dashboard'); };
-                    } else if (href.includes('messages')) {
-                        link.onclick = function(e) { e.preventDefault(); showPage('messages'); };
-                    }
+                    // Remove any existing onclick handlers
+                    link.onclick = null;
                 }
             });
         }
@@ -347,15 +343,205 @@
             // Handle home page first
             if (path === '/' || path === '/home') {
                 content.innerHTML = `
-                    <div class="hero">
+                    <!-- Hero Section -->
+                    <div class="hero-section">
                         <div class="container">
-                            <h1>Welcome to Skill Swap</h1>
-                            <p>Share your skills, learn from others, and grow together in our community marketplace.</p>
+                            <h1>🔄 Welcome to Skill Swap</h1>
+                            <p class="hero-subtitle">The ultimate peer-to-peer skill-sharing marketplace where knowledge meets opportunity</p>
                             
                             <div class="hero-actions">
-                                <button class="btn btn-primary" onclick="showPage('browse')">Browse Skills</button>
-                                <button class="btn btn-secondary" onclick="showPage('dashboard')">Dashboard</button>
-                                <button class="btn btn-success" onclick="showPage('upgrade')">Upgrade to Pro - $19.99/month</button>
+                                <button class="btn btn-primary btn-lg" data-navigate="/browse">🔍 Explore Skills</button>
+                                <button class="btn btn-secondary btn-lg" data-navigate="/register">🚀 Get Started Free</button>
+                                <button class="btn btn-success btn-lg" data-navigate="/upgrade">⭐ Go Pro</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- What is Skill Swap Section -->
+                    <div class="what-is-section">
+                        <div class="container">
+                            <div class="section-header">
+                                <h2>🤝 What is Skill Swap?</h2>
+                                <p class="section-description">Skill Swap is a revolutionary platform that connects people who want to share their expertise with those eager to learn. Whether you're a professional looking to monetize your skills or someone seeking to acquire new talents, our platform makes it seamless and rewarding.</p>
+                            </div>
+                            
+                            <div class="value-props">
+                                <div class="value-prop">
+                                    <div class="value-icon">🎓</div>
+                                    <h3>Learn from Experts</h3>
+                                    <p>Access verified professionals and skilled individuals across hundreds of categories</p>
+                                </div>
+                                <div class="value-prop">
+                                    <div class="value-icon">💰</div>
+                                    <h3>Monetize Your Skills</h3>
+                                    <p>Turn your expertise into income with our verified instructor program</p>
+                                </div>
+                                <div class="value-prop">
+                                    <div class="value-icon">🌟</div>
+                                    <h3>Quality Guaranteed</h3>
+                                    <p>Rated instructors with 3.5+ stars can earn money, ensuring high-quality experiences</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Features Section -->
+                    <div class="features-section">
+                        <div class="container">
+                            <h2>✨ Powerful Features</h2>
+                            <div class="features-grid">
+                                <div class="feature-card">
+                                    <div class="feature-icon">💬</div>
+                                    <h3>Real-time Messaging</h3>
+                                    <p>Instant communication with typing indicators, read receipts, and file sharing</p>
+                                </div>
+                                <div class="feature-card">
+                                    <div class="feature-icon">📹</div>
+                                    <h3>Video Integration</h3>
+                                    <p>Built-in video calling powered by Jitsi Meet for seamless online sessions</p>
+                                </div>
+                                <div class="feature-card">
+                                    <div class="feature-icon">📅</div>
+                                    <h3>Smart Booking</h3>
+                                    <p>Automated scheduling system with calendar integration and reminder notifications</p>
+                                </div>
+                                <div class="feature-card">
+                                    <div class="feature-icon">⭐</div>
+                                    <h3>Review System</h3>
+                                    <p>Comprehensive rating and review system to maintain quality and trust</p>
+                                </div>
+                                <div class="feature-card">
+                                    <div class="feature-icon">🔒</div>
+                                    <h3>Secure Authentication</h3>
+                                    <p>JWT-based security with Google OAuth integration for safe account management</p>
+                                </div>
+                                <div class="feature-card">
+                                    <div class="feature-icon">📱</div>
+                                    <h3>Mobile Responsive</h3>
+                                    <p>Fully responsive design works perfectly on desktop, tablet, and mobile devices</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subscription Tiers Section -->
+                    <div class="tiers-section">
+                        <div class="container">
+                            <h2>🎯 Choose Your Plan</h2>
+                            <div class="tiers-grid">
+                                <div class="tier-card free">
+                                    <div class="tier-header">
+                                        <h3>🆓 Free</h3>
+                                        <div class="tier-price">$0<span>/month</span></div>
+                                    </div>
+                                    <ul class="tier-features">
+                                        <li>✅ Basic skill sharing</li>
+                                        <li>✅ Up to 3 skills</li>
+                                        <li>✅ Basic messaging</li>
+                                        <li>✅ Standard support</li>
+                                        <li>❌ Video calling</li>
+                                        <li>❌ Priority listing</li>
+                                    </ul>
+                                    <button class="btn btn-secondary btn-full" onclick="showPage('register')">Get Started</button>
+                                </div>
+                                
+                                <div class="tier-card verified">
+                                    <div class="tier-header">
+                                        <h3>✅ Verified</h3>
+                                        <div class="tier-price">$9.99<span>/month</span></div>
+                                    </div>
+                                    <ul class="tier-features">
+                                        <li>✅ Everything in Free</li>
+                                        <li>✅ Verified instructor badge</li>
+                                        <li>✅ Video calling</li>
+                                        <li>✅ Priority support</li>
+                                        <li>✅ Can earn money (3.5+ stars)</li>
+                                        <li>✅ Advanced analytics</li>
+                                    </ul>
+                                    <button class="btn btn-primary btn-full" onclick="showPage('upgrade')">Upgrade</button>
+                                </div>
+                                
+                                <div class="tier-card pro popular">
+                                    <div class="tier-badge">🔥 Most Popular</div>
+                                    <div class="tier-header">
+                                        <h3>⭐ Pro</h3>
+                                        <div class="tier-price">$19.99<span>/month</span></div>
+                                    </div>
+                                    <ul class="tier-features">
+                                        <li>✅ Everything in Verified</li>
+                                        <li>✅ Unlimited skills</li>
+                                        <li>✅ Priority listing</li>
+                                        <li>✅ Custom branding</li>
+                                        <li>✅ Advanced features</li>
+                                        <li>✅ Premium support</li>
+                                    </ul>
+                                    <button class="btn btn-success btn-full" onclick="showPage('upgrade')">Go Pro</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- How It Works Section -->
+                    <div class="how-it-works-section">
+                        <div class="container">
+                            <h2>🚀 How It Works</h2>
+                            <div class="steps-grid">
+                                <div class="step">
+                                    <div class="step-number">1</div>
+                                    <h3>Create Your Profile</h3>
+                                    <p>Sign up for free and showcase your skills with detailed descriptions and portfolio items</p>
+                                </div>
+                                <div class="step">
+                                    <div class="step-number">2</div>
+                                    <h3>Connect & Communicate</h3>
+                                    <p>Browse skills, message instructors, and schedule sessions that fit your schedule</p>
+                                </div>
+                                <div class="step">
+                                    <div class="step-number">3</div>
+                                    <h3>Learn & Earn</h3>
+                                    <p>Attend sessions, leave reviews, and start earning money as a verified instructor</p>
+                                </div>
+                                <div class="step">
+                                    <div class="step-number">4</div>
+                                    <h3>Grow Your Network</h3>
+                                    <p>Build relationships, expand your skills, and become part of our thriving community</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats Section -->
+                    <div class="stats-section">
+                        <div class="container">
+                            <div class="stats-grid">
+                                <div class="stat">
+                                    <div class="stat-number">10K+</div>
+                                    <div class="stat-label">Active Users</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-number">500+</div>
+                                    <div class="stat-label">Skill Categories</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-number">50K+</div>
+                                    <div class="stat-label">Sessions Completed</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-number">4.9★</div>
+                                    <div class="stat-label">Average Rating</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CTA Section -->
+                    <div class="cta-section">
+                        <div class="container">
+                            <h2>Ready to Start Your Skill Journey?</h2>
+                            <p>Join thousands of learners and teachers in our growing community</p>
+                            <div class="cta-actions">
+                                <button class="btn btn-primary btn-lg" onclick="showPage('register')">🚀 Join Free Today</button>
+                                <button class="btn btn-secondary btn-lg" onclick="showPage('browse')">🔍 Explore Skills First</button>
                             </div>
                         </div>
                     </div>
@@ -372,7 +558,7 @@
                             <p>Welcome back! Sign in to your account.</p>
                             
                             <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                                <form id="loginForm" onsubmit="handleLogin(event)">
+                                <form id="loginForm">
                                     <div style="margin-bottom: 20px;">
                                         <label style="display: block; margin-bottom: 5px; font-weight: 500;">Email:</label>
                                         <input type="email" id="loginEmail" required style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px;">
@@ -393,15 +579,21 @@
                                 </button>
                                 
                                 <div style="text-align: center; margin-top: 20px;">
-                                    <p>Don't have an account? <a href="#" onclick="showPage('register')" style="color: #3B82F6;">Sign up here</a></p>
+                                    <p>Don't have an account? <a href="#" data-navigate="/register" style="color: #3B82F6;">Sign up here</a></p>
                                 </div>
                             </div>
                             
                             <div style="text-align: center;">
-                                <button class="btn btn-secondary" onclick="showPage('home')">← Back to Home</button>
+                                <button class="btn btn-secondary" data-navigate="/">← Back to Home</button>
                             </div>
                         </div>
                     `;
+                    
+                    // Add event listener for login form
+                    const loginForm = document.getElementById('loginForm');
+                    if (loginForm) {
+                        loginForm.addEventListener('submit', handleLogin);
+                    }
                     break;
                     
                 case '/register':
@@ -411,7 +603,7 @@
                             <p>Join Skill Swap and start sharing your skills!</p>
                             
                             <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                                <form id="registerForm" onsubmit="handleRegister(event)">
+                                <form id="registerForm">
                                     <div style="margin-bottom: 20px;">
                                         <label style="display: block; margin-bottom: 5px; font-weight: 500;">Full Name:</label>
                                         <input type="text" id="registerName" required style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px;">
@@ -436,15 +628,21 @@
                                 </button>
                                 
                                 <div style="text-align: center; margin-top: 20px;">
-                                    <p>Already have an account? <a href="#" onclick="showPage('login')" style="color: #3B82F6;">Sign in here</a></p>
+                                    <p>Already have an account? <a href="#" data-navigate="/login" style="color: #3B82F6;">Sign in here</a></p>
                                 </div>
                             </div>
                             
                             <div style="text-align: center;">
-                                <button class="btn btn-secondary" onclick="showPage('home')">← Back to Home</button>
+                                <button class="btn btn-secondary" data-navigate="/">← Back to Home</button>
                             </div>
                         </div>
                     `;
+                    
+                    // Add event listener for register form
+                    const registerForm = document.getElementById('registerForm');
+                    if (registerForm) {
+                        registerForm.addEventListener('submit', handleRegister);
+                    }
                     break;
                     
                 case '/upgrade':
@@ -498,8 +696,8 @@
                             </div>
                             
                             <div style="text-align: center;">
-                                <button class="btn btn-secondary" onclick="showPage('home')">← Back to Home</button>
-                                <button class="btn btn-primary" onclick="showPage('dashboard')">View Dashboard</button>
+                                <button class="btn btn-secondary" data-navigate="/">← Back to Home</button>
+                                <button class="btn btn-primary" data-navigate="/dashboard">View Dashboard</button>
                             </div>
                         </div>
                     `;
@@ -533,8 +731,8 @@
                             </div>
                             
                             <div style="margin: 20px 0; text-align: center;">
-                                <button class="btn btn-secondary" onclick="showPage('home')">← Back to Home</button>
-                                <button class="btn btn-primary" onclick="showPage('dashboard')">Go to Dashboard</button>
+                                <button class="btn btn-secondary" data-navigate="/">← Back to Home</button>
+                                <button class="btn btn-primary" data-navigate="/dashboard">Go to Dashboard</button>
                             </div>
                         </div>
                     `;
@@ -557,7 +755,7 @@
                                     <p>Your personal dashboard ${isPro ? '⭐ Pro Member' : '🆓 Free Plan'}</p>
                                 </div>
                                 <div>
-                                    ${!isPro ? '<button class="btn btn-success" onclick="showPage(\'upgrade\')">Upgrade to Pro</button>' : '<span style="background: linear-gradient(135deg, #3B82F6, #1D4ED8); color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold;">⭐ PRO</span>'}
+                                    ${!isPro ? '<button class="btn btn-success" data-navigate="/upgrade">Upgrade to Pro</button>' : '<span style="background: linear-gradient(135deg, #3B82F6, #1D4ED8); color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold;">⭐ PRO</span>'}
                                     <button class="btn btn-secondary" onclick="logout()" style="margin-left: 10px;">Logout</button>
                                 </div>
                             </div>
@@ -603,14 +801,14 @@
                                 <div style="background: #f0f9ff; border: 2px solid #3B82F6; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
                                     <h3>🚀 Ready to Level Up?</h3>
                                     <p>Upgrade to Pro and unlock unlimited skills, priority listing, and premium features!</p>
-                                    <button class="btn btn-success" onclick="showPage('upgrade')">Upgrade to Pro - $19.99/month</button>
+                                    <button class="btn btn-success" data-navigate="/upgrade">Upgrade to Pro - $19.99/month</button>
                                 </div>
                             `}
                             
                             <div style="margin: 20px 0; text-align: center;">
-                                <button class="btn btn-primary" onclick="showPage('browse')">Browse Skills</button>
-                                <button class="btn btn-secondary" onclick="showPage('messages')">Messages</button>
-                                <button class="btn btn-secondary" onclick="showPage('home')">← Back to Home</button>
+                                <button class="btn btn-primary" data-navigate="/browse">Browse Skills</button>
+                                <button class="btn btn-secondary" data-navigate="/messages">Messages</button>
+                                <button class="btn btn-secondary" data-navigate="/">← Back to Home</button>
                             </div>
                         </div>
                     `;
@@ -646,8 +844,8 @@
                             </div>
                             
                             <div style="margin: 20px 0; text-align: center;">
-                                <button class="btn btn-secondary" onclick="showPage('home')">← Back to Home</button>
-                                <button class="btn btn-primary" onclick="showPage('browse')">Browse Skills</button>
+                                <button class="btn btn-secondary" data-navigate="/">← Back to Home</button>
+                                <button class="btn btn-primary" data-navigate="/browse">Browse Skills</button>
                             </div>
                         </div>
                     `;

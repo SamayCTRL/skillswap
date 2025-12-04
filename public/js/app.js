@@ -532,34 +532,14 @@ const setupEventListeners = () => {
 
 // Global functions for HTML onclick handlers
 window.showLoginModal = () => {
-    const template = document.getElementById('login-modal-template');
-    const modalContainer = document.getElementById('modal-container');
-    
-    if (template && modalContainer) {
-        modalContainer.innerHTML = template.innerHTML;
-        initializeIcons();
-        
-        // Focus on first input
-        setTimeout(() => {
-            const firstInput = modalContainer.querySelector('input');
-            if (firstInput) firstInput.focus();
-        }, 100);
+    if (SkillSwap.router) {
+        SkillSwap.router.navigate('/login');
     }
 };
 
 window.showRegisterModal = () => {
-    const template = document.getElementById('register-modal-template');
-    const modalContainer = document.getElementById('modal-container');
-    
-    if (template && modalContainer) {
-        modalContainer.innerHTML = template.innerHTML;
-        initializeIcons();
-        
-        // Focus on first input
-        setTimeout(() => {
-            const firstInput = modalContainer.querySelector('input');
-            if (firstInput) firstInput.focus();
-        }, 100);
+    if (SkillSwap.router) {
+        SkillSwap.router.navigate('/register');
     }
 };
 
@@ -610,7 +590,9 @@ window.logout = async () => {
         updateUIForUnauthenticatedUser();
         
         // Navigate to home
-        SkillSwap.router.navigate('/');
+        if (SkillSwap.router) {
+            SkillSwap.router.navigate('/');
+        }
         
         SkillSwap.notifications.show('You have been logged out', 'info');
     } catch (error) {
@@ -642,9 +624,9 @@ window.searchSkills = () => {
 };
 
 window.upgradeSubscription = (tier) => {
-    // TODO: Implement subscription upgrade
-    if (SkillSwap.notifications) {
-        SkillSwap.notifications.show(`Upgrading to ${tier} plan...`, 'info');
+    // Navigate to upgrade page
+    if (SkillSwap.router) {
+        SkillSwap.router.navigate('/upgrade');
     }
 };
 
@@ -664,49 +646,56 @@ window.startNewConversation = () => {
     }
 };
 
-// Debug functions
-window.debugNavigateToBrowse = () => {
-    console.log('🔧 Debug: Testing navigation to /browse');
-    console.log('SkillSwap object:', SkillSwap);
-    console.log('Router available:', !!SkillSwap.router);
-    console.log('Navigate function:', typeof SkillSwap.router?.navigate);
-    
-    if (SkillSwap.router && typeof SkillSwap.router.navigate === 'function') {
-        console.log('✅ Router is available, navigating...');
-        SkillSwap.router.navigate('/browse');
-    } else {
-        console.error('❌ Router is not available!');
-        alert('Router is not available! Check console for details.');
-    }
+// Button action functions that were in index.html
+window.viewSkillDetails = (skillId) => {
+    alert(`📋 Skill Details: This will show detailed information about skill #${skillId || 'example'}. Feature coming soon!`);
 };
 
-window.debugTestRouter = () => {
-    console.log('🔧 Debug: Router diagnostics');
-    console.log('Current URL:', window.location.href);
-    console.log('SkillSwap global:', window.SkillSwap);
-    console.log('Router instance:', window.SkillSwap?.router);
-    console.log('Router methods:', Object.getOwnPropertyNames(window.SkillSwap?.router || {}));
-    
-    if (window.SkillSwap?.router?.routes) {
-        console.log('Available routes:', Array.from(window.SkillSwap.router.routes.keys()));
-    }
-    
-    alert('Check console for router diagnostics!');
+window.manageSkills = () => {
+    alert('📚 Manage Skills: This will open your skills management page. Feature coming soon!');
 };
 
-// Simple test function that should always work
-window.simpleTest = () => {
-    const message = 'JavaScript is working! SkillSwap object exists: ' + (typeof window.SkillSwap !== 'undefined');
-    alert(message);
-    console.log('Simple test executed');
-    console.log('SkillSwap object:', window.SkillSwap);
-    console.log('Available classes:', {
-        ApiClient: typeof ApiClient,
-        Router: typeof Router,
-        UIManager: typeof UIManager,
-        AuthManager: typeof AuthManager,
-        NotificationManager: typeof NotificationManager
-    });
+window.viewCalendar = () => {
+    alert('📅 Calendar: This will show your booking calendar. Feature coming soon!');
+};
+
+window.viewEarnings = () => {
+    alert('💰 Earnings: This will show your earnings dashboard. Feature coming soon!');
+};
+
+window.viewReviews = () => {
+    alert('⭐ Reviews: This will show all your reviews and ratings. Feature coming soon!');
+};
+
+window.openConversation = (userName) => {
+    alert(`💬 Opening conversation with ${userName || 'user'}. Real-time messaging feature coming soon!`);
+};
+
+window.handleUpgrade = () => {
+    const user = window.SkillSwap?.user;
+    if (!user) {
+        alert('🔐 Please sign in first to upgrade your account.');
+        if (SkillSwap.router) {
+            SkillSwap.router.navigate('/login');
+        }
+        return;
+    }
+    
+    const confirmed = confirm('💳 Upgrade to Pro for $19.99/month?\n\nYou will get:\n• Unlimited skills\n• Priority listing\n• Advanced features\n• Premium support');
+    
+    if (confirmed) {
+        // Update user to pro in localStorage for demo
+        user.isPro = true;
+        user.plan = 'pro';
+        if (window.SkillSwap) {
+            window.SkillSwap.user = user;
+        }
+        
+        alert('✅ Successfully upgraded to Pro! Welcome to Skill Swap Pro!');
+        if (SkillSwap.router) {
+            SkillSwap.router.navigate('/dashboard');
+        }
+    }
 };
 
 // Google OAuth handlers
