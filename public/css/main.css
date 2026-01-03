@@ -207,12 +207,13 @@ a:hover {
 
 /* Header */
 .header {
-    background: white;
+    background: rgba(255, 255, 255, 0.95);
     border-bottom: 1px solid var(--gray-200);
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    backdrop-filter: blur(10px);
 }
 
 .navbar {
@@ -228,30 +229,39 @@ a:hover {
 .nav-brand .logo {
     display: flex;
     align-items: center;
-    gap: var(--space-2);
-    font-weight: 700;
-    font-size: var(--font-size-lg);
+    gap: var(--space-3);
+    font-weight: 800;
+    font-size: var(--font-size-xl);
     color: var(--gray-900);
+    transition: transform 0.3s ease;
+}
+
+.nav-brand .logo:hover {
+    transform: scale(1.05);
 }
 
 .logo-text {
     color: var(--primary-600);
+    background: linear-gradient(135deg, var(--primary-600), var(--primary-800));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .nav-links {
     display: flex;
-    gap: var(--space-6);
+    gap: var(--space-8);
 }
 
 .nav-link {
     position: relative;
-    color: var(--gray-600);
+    color: var(--gray-700);
     font-weight: 500;
-    padding: var(--space-2) 0;
-    transition: color var(--transition-fast);
+    padding: var(--space-3) 0;
+    transition: color 0.3s ease;
     display: flex;
     align-items: center;
-    gap: var(--space-1);
+    gap: var(--space-2);
 }
 
 .nav-link:hover {
@@ -262,15 +272,21 @@ a:hover {
     color: var(--primary-600);
 }
 
-.nav-link.active::after {
+.nav-link::after {
     content: '';
     position: absolute;
-    bottom: -1px;
+    bottom: 0;
     left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--primary-600);
+    width: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-500), var(--primary-700));
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 2px;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+    width: 100%;
 }
 
 .nav-user {
@@ -378,80 +394,151 @@ a:hover {
     align-items: center;
     justify-content: center;
     gap: var(--space-2);
-    padding: var(--space-2) var(--space-4);
-    border-radius: var(--border-radius);
-    font-weight: 500;
-    font-size: var(--font-size-sm);
-    border: 1px solid transparent;
+    padding: var(--space-3) var(--space-5);
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: var(--font-size-base);
+    border: none;
     cursor: pointer;
-    transition: all var(--transition-fast);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
     white-space: nowrap;
-    min-height: 2.5rem;
+    min-height: 3rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.2);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.btn:hover::before {
+    transform: translateX(100%);
+}
+
+.btn:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.btn:active:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
 }
 
 .btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    transform: none;
 }
 
 .btn-primary {
-    background: var(--primary-600);
+    background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
     color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-    background: var(--primary-700);
+    background: linear-gradient(135deg, var(--primary-600), var(--primary-800));
     color: white;
 }
 
 .btn-secondary {
     background: white;
     color: var(--gray-700);
-    border-color: var(--gray-300);
+    border: 2px solid var(--gray-300);
 }
 
 .btn-secondary:hover:not(:disabled) {
     background: var(--gray-50);
     border-color: var(--gray-400);
-    color: var(--gray-700);
+    color: var(--gray-800);
 }
 
 .btn-success {
-    background: var(--success-600);
+    background: linear-gradient(135deg, var(--success-500), var(--success-700));
     color: white;
 }
 
 .btn-success:hover:not(:disabled) {
-    background: var(--success-700);
+    background: linear-gradient(135deg, var(--success-600), var(--success-800));
 }
 
 .btn-warning {
-    background: var(--warning-500);
+    background: linear-gradient(135deg, var(--warning-500), var(--warning-700));
     color: white;
 }
 
 .btn-warning:hover:not(:disabled) {
-    background: var(--warning-600);
+    background: linear-gradient(135deg, var(--warning-600), var(--warning-800));
 }
 
 .btn-danger {
-    background: var(--error-500);
+    background: linear-gradient(135deg, var(--error-500), var(--error-700));
     color: white;
 }
 
 .btn-danger:hover:not(:disabled) {
-    background: var(--error-600);
+    background: linear-gradient(135deg, var(--error-600), var(--error-800));
 }
 
 .btn-ghost {
     background: transparent;
     color: var(--gray-600);
+    box-shadow: none;
 }
 
 .btn-ghost:hover:not(:disabled) {
     background: var(--gray-100);
-    color: var(--gray-700);
+    color: var(--gray-800);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.btn-sm {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--font-size-sm);
+    min-height: 2.5rem;
+    border-radius: 8px;
+}
+
+.btn-lg {
+    padding: var(--space-4) var(--space-6);
+    font-size: var(--font-size-lg);
+    min-height: 3.5rem;
+    border-radius: 14px;
+}
+
+.btn-full {
+    width: 100%;
+}
+
+.btn-icon {
+    padding: var(--space-2);
+    min-height: 2.5rem;
+    width: 2.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-icon:hover {
+    background: var(--gray-100);
+    transform: scale(1.1);
 }
 
 .btn-sm {
@@ -621,34 +708,52 @@ a:hover {
     padding: var(--space-20) 0;
     text-align: center;
     margin-bottom: var(--space-16);
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    margin: 30px;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+    transform: rotate(30deg);
 }
 
 .hero-section h1 {
-    font-size: 3.5rem;
+    font-size: 3.8rem;
     font-weight: 800;
     margin-bottom: var(--space-6);
     background: linear-gradient(135deg, var(--primary-600), var(--primary-800));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    position: relative;
+    letter-spacing: -1px;
 }
 
 .hero-subtitle {
     font-size: var(--font-size-xl);
     color: var(--gray-600);
     margin-bottom: var(--space-10);
-    max-width: 700px;
+    max-width: 750px;
     margin-left: auto;
     margin-right: auto;
-    line-height: 1.6;
+    line-height: 1.7;
+    font-weight: 500;
 }
 
 .hero-actions {
     display: flex;
-    gap: var(--space-4);
+    gap: var(--space-5);
     justify-content: center;
     flex-wrap: wrap;
-    margin-top: var(--space-8);
+    margin-top: var(--space-10);
 }
 
 /* What is Skill Swap Section */
@@ -741,22 +846,35 @@ a:hover {
 
 .tier-card {
     background: white;
-    border-radius: var(--border-radius-xl);
+    border-radius: 20px;
     padding: var(--space-8);
     text-align: center;
     position: relative;
     border: 2px solid var(--gray-200);
-    transition: all var(--transition-fast);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+
+.tier-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-500), var(--success-500));
 }
 
 .tier-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-xl);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.12);
 }
 
 .tier-card.popular {
     border-color: var(--primary-500);
     transform: scale(1.05);
+    box-shadow: 0 15px 30px rgba(59, 130, 246, 0.2);
 }
 
 .tier-card.popular .tier-header {
@@ -764,7 +882,7 @@ a:hover {
     color: white;
     margin: calc(-1 * var(--space-8)) calc(-1 * var(--space-8)) var(--space-6);
     padding: var(--space-6) var(--space-8);
-    border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
+    border-radius: 20px 20px 0 0;
 }
 
 .tier-badge {
@@ -1365,17 +1483,28 @@ a:hover {
 /* Skill Cards */
 .skill-card {
     background: white;
-    border-radius: var(--border-radius-lg);
+    border-radius: 16px;
     border: 1px solid var(--gray-200);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
     overflow: hidden;
-    transition: all var(--transition-fast);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
+    position: relative;
+}
+
+.skill-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-500), var(--success-500));
 }
 
 .skill-card:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+    transform: translateY(-4px);
 }
 
 .skill-card-header {

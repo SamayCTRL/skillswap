@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server/server.js",
+      "use": "@vercel/node",
+      "config": { 
+        "includeFiles": ["server/**/*", "public/**/*", "package.json", "package-lock.json", "*.js", "*.json", "*.env"]
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "^/api/(.*)$",
+      "dest": "/server/server.js"
+    },
+    {
+      "src": "^/(.*)$",
+      "dest": "/server/server.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "PORT": "3000"
+  }
+}

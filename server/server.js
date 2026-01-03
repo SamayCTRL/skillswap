@@ -134,7 +134,8 @@ app.get('/health', (req, res) => {
 
 // API Routes
 app.use('/api/auth', authLimiter, authRoutes);
-app.use('/api/users', authMiddleware, userRoutes);
+// Use optional authentication for public user profile access
+app.use('/api/users', userRoutes);
 app.use('/api/skills', skillRoutes);
 app.use('/api/messages', authMiddleware, messageRoutes);
 app.use('/api/bookings', authMiddleware, bookingRoutes);

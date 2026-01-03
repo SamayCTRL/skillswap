@@ -2,18 +2,18 @@ const { Pool } = require('pg');
 require('dotenv').config();
 
 const pool = new Pool({
-    user: process.env.DB_USER || 'postgres',
-    host: process.env.DB_HOST || 'localhost',
-    database: process.env.DB_NAME || 'skill_swap',
-    password: process.env.DB_PASSWORD || 'password',
-    port: process.env.DB_PORT || 5432,
+    user: process.env.DB_USER || process.env.SUPABASE_USER || 'postgres',
+    host: process.env.DB_HOST || process.env.SUPABASE_HOST || 'localhost',
+    database: process.env.DB_NAME || process.env.SUPABASE_DATABASE || 'skill_swap',
+    password: process.env.DB_PASSWORD || process.env.SUPABASE_PASSWORD || 'password',
+    port: process.env.DB_PORT || process.env.SUPABASE_PORT || 5432,
     
     // Connection pool settings
     max: 20, // maximum number of connections
     idleTimeoutMillis: 30000, // close idle connections after 30 seconds
     connectionTimeoutMillis: 2000, // return an error if connection takes longer than 2 seconds
     
-    // SSL configuration for production
+    // SSL configuration for production (required for Supabase)
     ssl: process.env.NODE_ENV === 'production' ? {
         rejectUnauthorized: false
     } : false

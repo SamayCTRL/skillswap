@@ -380,15 +380,85 @@ See `.env.example` for all available configuration options.
 
 ## Deployment
 
-### Railway Deployment (Backend)
+### Vercel + Supabase Deployment (Recommended)
+
+This application can be deployed on Vercel (frontend) with Supabase (backend/database):
+
+#### Part 1: Set up Supabase Backend
+
+1. **Create a Supabase account**:
+   - Go to [supabase.com](https://supabase.com) and sign up
+   - Create a new project
+
+2. **Set up your database**:
+   - In your Supabase dashboard, go to SQL Editor
+   - Run the database schema from `server/models/database.sql` to create tables
+   - Or use the setup script after deployment
+
+3. **Get your connection details**:
+   - Go to Project Settings → Database
+   - Note your Host, Database, Username, Password, and Port
+
+#### Part 2: Deploy to Vercel
+
+1. **Prepare your code**:
+   - Push this code to a GitHub/GitLab/Bitbucket repository
+
+2. **Deploy to Vercel**:
+   - Go to [vercel.com](https://vercel.com) and connect your Git account
+   - Import your repository
+   - In the settings, set:
+     - Build Command: `npm run vercel-build`
+     - Output Directory: leave empty
+     - Install Command: `npm install`
+
+3. **Add Environment Variables in Vercel Dashboard**:
+   - `NODE_ENV` - Set to 'production'
+   - `SUPABASE_HOST` - Your Supabase project URL
+   - `SUPABASE_PORT` - Usually 5432
+   - `SUPABASE_DATABASE` - Usually 'postgres'
+   - `SUPABASE_USER` - Your Supabase database user
+   - `SUPABASE_PASSWORD` - Your Supabase database password
+   - `JWT_SECRET` - JWT secret for authentication
+   - `JWT_REFRESH_SECRET` - JWT refresh token secret
+   - `GOOGLE_CLIENT_ID` - Google OAuth client ID
+   - `SENDGRID_API_KEY` or AWS credentials for email service
+
+4. **Vercel Configuration**:
+   The `vercel.json` file is already configured for this application:
+   ```json
+   {
+     "version": 2,
+     "builds": [
+       {
+         "src": "server/server.js",
+         "use": "@vercel/node",
+         "config": { 
+           "includeFiles": ["server/**/*", "public/**/*", "package.json", "package-lock.json", "*.js", "*.json", "*.env"]
+         }
+       }
+     ],
+     "routes": [
+       {
+         "src": "^(api/.*)$",
+         "dest": "server/server.js"
+       },
+       {
+         "src": "^(.*)$",
+         "dest": "server/server.js"
+       }
+     ],
+     "env": {
+       "NODE_ENV": "production",
+       "PORT": "3000"
+     }
+   }
+   ```
+
+### Alternative: Railway Deployment
 1. Connect GitHub repository
 2. Set environment variables
 3. Deploy automatically on push
-
-### Netlify/Vercel Deployment (Frontend)
-1. Build static files
-2. Configure redirects for SPA
-3. Deploy frontend separately
 
 ### Docker Deployment
 ```dockerfile
@@ -397,9 +467,19 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production
 COPY . .
-EXPOSE 3000
+EXPOSE 8000
 CMD ["npm", "start"]
 ```
+
+### Post-Deployment Setup
+
+After deployment, run the database setup:
+
+```bash
+npm run setup
+```
+
+This will create the necessary database tables and initial data.
 
 ## Contributing
 
