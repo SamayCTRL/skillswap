@@ -1331,7 +1331,7 @@
                     `;
                     break;
                     
-                case path.startsWith('/user/') && path.split('/').length === 3:
+                case (path.startsWith('/user/') && path.split('/').length === 3):
                     const profileUserId = path.split('/')[2];
                     
                     // In a real app, we would fetch user data from the API
@@ -1339,8 +1339,8 @@
                     content.innerHTML = `
                         <div class="container" style="padding: 40px 20px;">
                             <div style="text-align: center; margin-bottom: 40px;">
-                                <div style="width: 120px; height: 120px; border-radius: 50%; background: #3B82F6; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; margin: 0 auto 20px;">${userId.charAt(0).toUpperCase()}</div>
-                                <h1>${userId}'s Profile</h1>
+                                <div style="width: 120px; height: 120px; border-radius: 50%; background: #3B82F6; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; margin: 0 auto 20px;">${profileUserId.charAt(0).toUpperCase()}</div>
+                                <h1>${profileUserId}'s Profile</h1>
                                 <p style="color: #6B7280;">Skill Instructor & Community Member</p>
                                 <div style="display: flex; justify-content: center; gap: 30px; margin-top: 20px;">
                                     <div><strong>24</strong><br><span style="color: #6B7280;">Skills</span></div>
