@@ -830,9 +830,9 @@ a:hover {
 
 .tiers-section h2 {
     text-align: center;
-    font-size: var(--font-size-3xl);
+    font-size: var(--font-size-2xl);
     font-weight: 700;
-    margin-bottom: var(--space-12);
+    margin-bottom: var(--space-10);
     color: var(--gray-900);
 }
 
@@ -878,7 +878,7 @@ a:hover {
 }
 
 .tier-card.popular .tier-header {
-    background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+    background: linear-gradient(135deg, var(--warning-500), var(--warning-700));
     color: white;
     margin: calc(-1 * var(--space-8)) calc(-1 * var(--space-8)) var(--space-6);
     padding: var(--space-6) var(--space-8);
@@ -899,15 +899,15 @@ a:hover {
 }
 
 .tier-header h3 {
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-xl);
     font-weight: 700;
     margin-bottom: var(--space-2);
 }
 
 .tier-price {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     font-weight: 800;
-    color: var(--primary-600);
+    color: var(--gray-800);
     margin-bottom: var(--space-6);
 }
 
