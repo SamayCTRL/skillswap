@@ -48,6 +48,37 @@
             transform: translateX(-100%);
             transition: transform 0.6s ease;
         }
+        
+        .user-welcome {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        #auth-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        #logout-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        #logout-btn:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3);
+        }
         .btn:hover::before {
             transform: translateX(100%);
         }
@@ -542,11 +573,13 @@
             if (user) {
                 const isPro = user.isPro || false;
                 authButtons.innerHTML = `
-                    <span style="margin-right: 15px; color: #374151;">Welcome, ${user.name} ${isPro ? '⭐' : ''}</span>
-                    <button class="btn btn-secondary" data-navigate="/dashboard">Dashboard</button>
-                    <button class="btn btn-primary" onclick="showAddSkill()">Add Skill</button>
-                    ${!isPro ? '<button class="btn btn-success" data-navigate="/upgrade" style="margin-right: 10px;">Upgrade to Pro</button>' : ''}
-                    <button class="btn btn-primary" onclick="logout()">Logout</button>
+                    <div class="user-welcome">
+                        <span style="color: #374151; margin-right: 15px; font-weight: 500;">Welcome, ${user.name} ${isPro ? '⭐' : ''}</span>
+                    </div>
+                    <button class="btn btn-secondary" data-navigate="/dashboard" style="margin-right: 8px;">Dashboard</button>
+                    <button class="btn btn-primary" onclick="showAddSkill()" style="margin-right: 8px;">Add Skill</button>
+                    ${!isPro ? '<button class="btn btn-success" data-navigate="/upgrade" style="margin-right: 8px;">Upgrade to Pro</button>' : ''}
+                    <button class="btn btn-primary" onclick="logout()" id="logout-btn">Logout</button>
                 `;
             } else {
                 authButtons.innerHTML = `
@@ -1650,6 +1683,12 @@
                     e.preventDefault();
                     const path = navButton.getAttribute('data-navigate');
                     navigateToPage(path);
+                }
+                
+                // Handle logout button click
+                if (e.target.closest('#logout-btn')) {
+                    e.preventDefault();
+                    logout();
                 }
             });
             
