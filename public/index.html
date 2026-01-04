@@ -940,6 +940,215 @@
             }
             
             switch (path) {
+                case '/':
+                case '':
+                case '/home':
+                    content.innerHTML = `
+                        <!-- Hero Section -->
+                        <div class="hero-section">
+                            <div class="container">
+                                <h1>🔄 Welcome to Skill Swap</h1>
+                                <p class="hero-subtitle">The ultimate peer-to-peer skill-sharing marketplace where knowledge meets opportunity</p>
+                                
+                                <div class="hero-actions">
+                                    <button class="btn btn-primary btn-lg" data-navigate="/browse">🔍 Explore Skills</button>
+                                    <button class="btn btn-secondary btn-lg" data-navigate="/register">🚀 Get Started Free</button>
+                                    <button class="btn btn-success btn-lg" data-navigate="/upgrade">⭐ Go Pro</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- What is Skill Swap Section -->
+                        <div class="what-is-section">
+                            <div class="container">
+                                <div class="section-header">
+                                    <h2>🤝 What is Skill Swap?</h2>
+                                    <p class="section-description readable-text">Skill Swap is a revolutionary platform that connects people who want to share their expertise with those eager to learn. Whether you're a professional looking to monetize your skills or someone seeking to acquire new talents, our platform makes it seamless and rewarding.</p>
+                                </div>
+                                
+                                <div class="value-props">
+                                    <div class="value-prop">
+                                        <div class="value-icon">🎓</div>
+                                        <h3>🎓 Learn from Experts</h3>
+                                        <p class="readable-text">Access verified professionals and skilled individuals across hundreds of categories</p>
+                                    </div>
+                                    <div class="value-prop">
+                                        <div class="value-icon">💰</div>
+                                        <h3>💰 Monetize Your Skills</h3>
+                                        <p class="readable-text">Turn your expertise into income with our verified instructor program</p>
+                                    </div>
+                                    <div class="value-prop">
+                                        <div class="value-icon">🌟</div>
+                                        <h3>🌟 Quality Guaranteed</h3>
+                                        <p class="readable-text">Rated instructors with 3.5+ stars can earn money, ensuring high-quality experiences</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Features Section -->
+                        <div class="features-section">
+                            <div class="container">
+                                <h2>✨ Powerful Features</h2>
+                                <div class="features-grid">
+                                    <div class="feature-card">
+                                        <div class="feature-icon">💬</div>
+                                        <h3>Real-time Messaging</h3>
+                                        <p class="readable-text">Instant communication with typing indicators, read receipts, and file sharing</p>
+                                    </div>
+                                    <div class="feature-card">
+                                        <div class="feature-icon">📹</div>
+                                        <h3>📹 Video Integration</h3>
+                                        <p class="readable-text">Built-in video calling powered by Jitsi Meet for seamless online sessions</p>
+                                    </div>
+                                    <div class="feature-card">
+                                        <div class="feature-icon">📅</div>
+                                        <h3>📅 Smart Booking</h3>
+                                        <p class="readable-text">Automated scheduling system with calendar integration and reminder notifications</p>
+                                    </div>
+                                    <div class="feature-card">
+                                        <div class="feature-icon">⭐</div>
+                                        <h3>⭐ Review System</h3>
+                                        <p class="readable-text">Comprehensive rating and review system to maintain quality and trust</p>
+                                    </div>
+                                    <div class="feature-card">
+                                        <div class="feature-icon">🔒</div>
+                                        <h3>🔒 Secure Authentication</h3>
+                                        <p class="readable-text">JWT-based security with Google OAuth integration for safe account management</p>
+                                    </div>
+                                    <div class="feature-card">
+                                        <div class="feature-icon">📱</div>
+                                        <h3>📱 Mobile Responsive</h3>
+                                        <p class="readable-text">Fully responsive design works perfectly on desktop, tablet, and mobile devices</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Subscription Tiers Section -->
+                        <div class="tiers-section">
+                            <div class="container">
+                                <h2>🎯 Choose Your Plan</h2>
+                                <div class="tiers-grid">
+                                    <div class="tier-card free">
+                                        <div class="tier-header">
+                                            <h3>🆓 Free</h3>
+                                            <div class="tier-price">$0<span>/month</span></div>
+                                        </div>
+                                        <ul class="tier-features">
+                                            <li>✅ Basic skill sharing</li>
+                                            <li>✅ Up to 3 skills</li>
+                                            <li>✅ Basic messaging</li>
+                                            <li>✅ Standard support</li>
+                                            <li>❌ Video calling</li>
+                                            <li>❌ Priority listing</li>
+                                        </ul>
+                                        <button class="btn btn-secondary btn-full" onclick="showPage('register')">Get Started</button>
+                                    </div>
+                                    
+                                    <div class="tier-card verified">
+                                        <div class="tier-header">
+                                            <h3>✅ Verified</h3>
+                                            <div class="tier-price">$9.99<span>/month</span></div>
+                                        </div>
+                                        <ul class="tier-features">
+                                            <li>✅ Everything in Free</li>
+                                            <li>✅ Verified instructor badge</li>
+                                            <li>✅ Video calling</li>
+                                            <li>✅ Priority support</li>
+                                            <li>✅ Can earn money (3.5+ stars)</li>
+                                            <li>✅ Advanced analytics</li>
+                                        </ul>
+                                        <button class="btn btn-primary btn-full" onclick="showPage('upgrade')">Upgrade</button>
+                                    </div>
+                                    
+                                    <div class="tier-card pro popular">
+                                        <div class="tier-badge">🔥 Most Popular</div>
+                                        <div class="tier-header">
+                                            <h3>⭐ Pro</h3>
+                                            <div class="tier-price">$19.99<span>/month</span></div>
+                                        </div>
+                                        <ul class="tier-features">
+                                            <li>✅ Everything in Verified</li>
+                                            <li>✅ Unlimited skills</li>
+                                            <li>✅ Priority listing</li>
+                                            <li>✅ Custom branding</li>
+                                            <li>✅ Advanced features</li>
+                                            <li>✅ Premium support</li>
+                                        </ul>
+                                        <button class="btn btn-success btn-full" onclick="showPage('upgrade')">Go Pro</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- How It Works Section -->
+                        <div class="how-it-works-section">
+                            <div class="container">
+                                <h2>🚀 How It Works</h2>
+                                <div class="steps-grid">
+                                    <div class="step">
+                                        <div class="step-number">1</div>
+                                        <h3>Create Your Profile</h3>
+                                        <p>Sign up for free and showcase your skills with detailed descriptions and portfolio items</p>
+                                    </div>
+                                    <div class="step">
+                                        <div class="step-number">2</div>
+                                        <h3>Connect & Communicate</h3>
+                                        <p>Browse skills, message instructors, and schedule sessions that fit your schedule</p>
+                                    </div>
+                                    <div class="step">
+                                        <div class="step-number">3</div>
+                                        <h3>Learn & Earn</h3>
+                                        <p>Attend sessions, leave reviews, and start earning money as a verified instructor</p>
+                                    </div>
+                                    <div class="step">
+                                        <div class="step-number">4</div>
+                                        <h3>Grow Your Network</h3>
+                                        <p>Build relationships, expand your skills, and become part of our thriving community</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stats Section -->
+                        <div class="stats-section">
+                            <div class="container">
+                                <div class="stats-grid">
+                                    <div class="stat">
+                                        <div class="stat-number">10K+</div>
+                                        <div class="stat-label">Active Users</div>
+                                    </div>
+                                    <div class="stat">
+                                        <div class="stat-number">500+</div>
+                                        <div class="stat-label">Skill Categories</div>
+                                    </div>
+                                    <div class="stat">
+                                        <div class="stat-number">50K+</div>
+                                        <div class="stat-label">Sessions Completed</div>
+                                    </div>
+                                    <div class="stat">
+                                        <div class="stat-number">4.9★</div>
+                                        <div class="stat-label">Average Rating</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CTA Section -->
+                        <div class="cta-section">
+                            <div class="container">
+                                <h2>Ready to Start Your Skill Journey?</h2>
+                                <p>Join thousands of learners and teachers in our growing community</p>
+                                <div class="cta-actions">
+                                    <button class="btn btn-primary btn-lg" onclick="showPage('register')">🚀 Join Free Today</button>
+                                    <button class="btn btn-secondary btn-lg" data-navigate="/browse">🔍 Explore Skills First</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    console.log('🏠 Homepage loaded successfully');
+                    return;
                 case '/login':
                     content.innerHTML = `
                         <div class="container" style="padding: 40px 20px; max-width: 500px;">
