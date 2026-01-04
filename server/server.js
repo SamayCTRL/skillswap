@@ -220,16 +220,14 @@ const startServer = async () => {
         console.log('✅ Database connected successfully');
 
         // Start server
-        server.listen(PORT, () => {
-            console.log(`🚀 Skill Swap server running on port ${PORT}`);
-            console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-            console.log(`🔗 Health check: http://localhost:${PORT}/health`);
-            
-            if (process.env.NODE_ENV === 'development') {
-                console.log(`🌐 API Base URL: http://localhost:${PORT}/api`);
-                console.log(`📱 Frontend URL: http://localhost:${PORT}`);
-            }
-        });
+        // For Vercel, we don't start the server listening in the traditional way
+        // Vercel handles the server startup and port assignment
+        console.log('✅ Skill Swap server configured for Vercel');
+        console.log('📊 Environment: ' + (process.env.NODE_ENV || 'development'));
+        
+        if (process.env.NODE_ENV === 'development') {
+            console.log('🚀 Local server would run on port ' + PORT);
+        }
     } catch (error) {
         console.error('❌ Failed to start server:', error);
         process.exit(1);
@@ -263,7 +261,9 @@ process.on('uncaughtException', (error) => {
     process.exit(1);
 });
 
-// Start the server
-startServer();
+// For Vercel, only start server in development
+if (process.env.NODE_ENV !== 'production') {
+    startServer();
+}
 
 module.exports = app;
