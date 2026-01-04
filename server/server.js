@@ -215,13 +215,8 @@ app.get(/.*/, (req, res) => {
 // For Vercel serverless compatibility, don't establish connection on startup
 const startServer = async () => {
     try {
-        // Test database connection
-        await db.query('SELECT NOW()');
-        console.log('✅ Database connected successfully');
-
-        // Start server
-        // For Vercel, we don't start the server listening in the traditional way
-        // Vercel handles the server startup and port assignment
+        // For Vercel, skip the initial database connection test
+        // Database connections will be established per request
         console.log('✅ Skill Swap server configured for Vercel');
         console.log('📊 Environment: ' + (process.env.NODE_ENV || 'development'));
         
@@ -230,7 +225,10 @@ const startServer = async () => {
         }
     } catch (error) {
         console.error('❌ Failed to start server:', error);
-        process.exit(1);
+        // Don't exit in serverless environment
+        if (process.env.NODE_ENV !== 'production') {
+            process.exit(1);
+        }
     }
 };
 
