@@ -212,7 +212,7 @@ app.get(/.*/, (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-// Database connection test
+// For Vercel serverless compatibility, don't establish connection on startup
 const startServer = async () => {
     try {
         // Test database connection
