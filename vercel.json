@@ -3,18 +3,14 @@
   "builds": [
     {
       "src": "server/server.js",
-      "use": "@vercel/node",
-      "config": { 
-        "includeFiles": ["server/**/*", "public/**/*", "package.json", "package-lock.json", "*.js", "*.json", "*.env"]
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/server/server.js" },
-    { "src": "/(.*)", "dest": "/server/server.js" }
+    { "src": "/api/(.*)", "dest": "/api" },
+    { "src": "/(.*)", "dest": "/" }
   ],
   "env": {
-    "NODE_ENV": "production",
-    "PORT": "3000"
+    "NODE_ENV": "production"
   }
 }
